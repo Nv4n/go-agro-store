@@ -58,9 +58,8 @@ func (ns NullCategoryType) Value() (driver.Value, error) {
 type ChatStatus string
 
 const (
-	ChatStatusOpen    ChatStatus = "open"
-	ChatStatusClosed  ChatStatus = "closed"
-	ChatStatusPending ChatStatus = "pending"
+	ChatStatusOpen   ChatStatus = "open"
+	ChatStatusClosed ChatStatus = "closed"
 )
 
 func (e *ChatStatus) Scan(src interface{}) error {
@@ -271,11 +270,10 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 }
 
 type Chat struct {
-	ID         pgtype.UUID
-	Status     ChatStatus
-	CreatedAt  pgtype.Timestamptz
-	UpdatedAt  pgtype.Timestamptz
-	IsResolved pgtype.Bool
+	ID        pgtype.UUID
+	Status    ChatStatus
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
 }
 
 type Delivery struct {
@@ -305,13 +303,21 @@ type Message struct {
 }
 
 type Order struct {
-	ID          pgtype.UUID
-	UserID      pgtype.UUID
-	TotalAmount pgtype.Numeric
-	Status      OrderType
-	Address     string
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
+	ID        pgtype.UUID
+	UserID    pgtype.UUID
+	Status    OrderType
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+}
+
+type OrderDetail struct {
+	ID              pgtype.UUID
+	OrderID         pgtype.UUID
+	Address         string
+	PhoneNumber     pgtype.Text
+	ReturnStatement pgtype.Text
+	CreatedAt       pgtype.Timestamp
+	UpdatedAt       pgtype.Timestamp
 }
 
 type OrderItem struct {
@@ -334,15 +340,15 @@ type Product struct {
 }
 
 type ProductInteraction struct {
-	ID            pgtype.UUID
-	ProductID     pgtype.UUID
-	UserID        pgtype.UUID
-	Type          ProdInteractionType
-	Content       string
-	IsAnswered    pgtype.Bool
-	AdminResponse pgtype.Text
-	CreatedAt     pgtype.Timestamptz
-	UpdatedAt     pgtype.Timestamptz
+	ID         pgtype.UUID
+	ProductID  pgtype.UUID
+	UserID     pgtype.UUID
+	Type       ProdInteractionType
+	Content    string
+	IsAnswered pgtype.Bool
+	Response   pgtype.Text
+	CreatedAt  pgtype.Timestamptz
+	UpdatedAt  pgtype.Timestamptz
 }
 
 type ProductTag struct {
