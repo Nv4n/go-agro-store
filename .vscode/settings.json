@@ -1,0 +1,17 @@
+{
+    "editor.formatOnSave": true,
+    "[templ]": {
+        "editor.defaultFormatter": "a-h.templ"
+    },
+    "tailwindCSS.includeLanguages": {
+        "templ": "html"
+    },
+    "emmet.includeLanguages": {
+        "templ": "html"
+    },
+    "templ.log": "/Users/adrian/templ.log",
+    "templ.goplsLog": "/Users/adrian/gopls.log",
+    "templ.http": "localhost:7575",
+    "templ.goplsRPCTrace": true,
+    "templ.pprof": false,
+}
