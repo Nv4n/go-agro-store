@@ -1,0 +1,51 @@
+package example
+
+import (t "agro.store/types")
+
+templ Slot(name string) {
+	<slot name={ name }>
+		<div>Loading { name }...</div>
+	</slot>
+}
+
+templ dad() {
+	faf
+}
+
+templ A() {
+	<div>Component A.</div>
+}
+
+templ B() {
+	<div>Component B.</div>
+}
+
+templ C() {
+	<div>Component C.</div>
+}
+
+templ Page(data chan t.SlotContents) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>Page</title>
+		</head>
+		<body>
+			<h1>Page</h1>
+			@templ.Flush() {
+				<template shadowrootmode="open">
+					@Slot("a")
+					@Slot("b")
+					@Slot("c")
+				</template>
+			}
+			for sc := range data {
+				@templ.Flush() {
+					<div slot={ sc.Name }>
+						@sc.Contents
+					</div>
+				}
+			}
+		</body>
+	</html>
+}
