@@ -1,12 +1,21 @@
 version: '2'
 cloud:
   project: '01JAT6HRZJEYTN9GR152RYRFX7'
+servers:
+  - engine: postgresql
+    uri: "postgresql://postgres:d4-R9fsxTUX!XPq8*J8NfjEEzJBMyCeX@localhost:5432/agro-nursery"
 sql:
-  - schema: sql/schema.sql
+  - engine: postgresql
+    schema: sql/schema.sql
     queries: sql/query.sql
-    engine: postgresql
+    name: "queryName"
     gen:
       go:
         package: "db"
         out: "db"
         sql_package: "pgx/v5"
+    database:
+      uri: "postgresql://postgres:d4-R9fsxTUX!XPq8*J8NfjEEzJBMyCeX@localhost:5432/agro-nursery"
+      managed: false
+    rules:
+      - sqlc/db-prepare

@@ -1,5 +1,17 @@
 CREATE TYPE USER_ROLE AS ENUM ('user','support','admin');
 
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    set search_path = ''
+AS
+$$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$;
+
 CREATE TABLE users
 (
     id         UUID PRIMARY KEY         DEFAULT gen_random_uuid(),
@@ -185,17 +197,3 @@ CREATE INDEX idx_chat_status ON chats (status);
 CREATE INDEX idx_messages_chat_id ON messages (chat_id);
 CREATE INDEX idx_orders_user_id ON orders (user_id);
 CREATE INDEX idx_product_interactions_product_id ON product_interactions (product_id);
-
-
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-    RETURNS TRIGGER
-    LANGUAGE plpgsql
-    set search_path = ''
-AS
-$$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$;
-
