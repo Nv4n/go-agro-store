@@ -1,0 +1,199 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+/* 2. Remove default margin */
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    /* 3. Add accessible line-height */
+    line-height: 1.5;
+    /* 4. Improve text rendering */
+    -webkit-font-smoothing: antialiased;
+}
+/* 5. Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+/* 6. Inherit fonts for form controls */
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+/* 7. Avoid text overflows */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    overflow-wrap: break-word;
+}
+/* 8. Improve line wrapping */
+p {
+    text-wrap: pretty;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-wrap: balance;
+}
+/*
+    9. Create a root stacking context
+  */
+#root,
+#__next {
+    isolation: isolate;
+}
+
+/* MAIN CSS */
+:root {
+    --primary-font: "Montserrat Alternates", serif;
+    --primary-pad: 1rem;
+    --primary-radius: 0.8rem;
+
+    --primary-col-400: #0d986a;
+    --secondary-col-400: #435b71;
+    --secondary-col-700: #002140;
+
+    --item-col-400: #dbe7d5;
+    --item-col-700: #bfd5b4;
+    --item-col2-400: #d5e3e7;
+    --item-col2-700: #b4ced5;
+    --item-col3-400: #f9d7be;
+    --item-col3-400: #f5bb8f;
+}
+
+* {
+    font-family: var(--primary-font);
+    color: inherit;
+}
+a {
+    cursor: pointer;
+}
+
+body {
+    color: var(--secondary-col-400);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--primary-pad);
+}
+header * {
+    font-size: 1.75rem;
+}
+
+nav {
+    margin-left: auto;
+}
+
+.logo {
+    display: flex;
+    color: var(--primary-col-400);
+    gap: var(--primary-pad);
+}
+
+.navlist {
+    display: flex;
+    list-style: none;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.navlist > *::after {
+    content: "|";
+}
+
+.navlist > :last-child::after {
+    content: "";
+}
+
+.navlist a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.info-block {
+    display: grid;
+    width: 100%;
+    padding: var(--primary-pad);
+    grid-template-columns: 0.5fr 1fr;
+    background-color: var(--item-col3-400);
+    color: var(--secondary-col-700);
+    margin: 0 auto;
+    margin-bottom: var(--primary-pad);
+    width: fit-content;
+    align-content: flex-start;
+    border-radius: var(--primary-radius);
+    position: relative;
+}
+
+.info-block img {
+    position: relative;
+    width: 100%;
+    top: -25px;
+    left: 0;
+}
+.info-block h2 {
+    font-size: 1.5rem;
+}
+
+.info-block span {
+    font-size: 1rem;
+}
+
+.product {
+    border-radius: 0.8rem;
+}
+
+.item1 {
+    background-color: var(--item-col-400);
+}
+
+.item2 {
+    background-color: var(--item-col2-400);
+}
+
+.item3 {
+    background-color: var(--item-col3-400);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+@media screen and (width <=1200px) {
+    header * {
+        font-size: 1.25rem;
+    }
+}
+
+@media screen and (width <=600px) {
+    header * {
+        font-size: 1rem;
+    }
+}
