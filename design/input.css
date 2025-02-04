@@ -16,3 +16,5 @@
     --color-item3-400: #f9d7be;
     --color-item3-700: #f5bb8f;
 }
+
+@config "../tailwind.config.mjs";
