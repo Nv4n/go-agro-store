@@ -54,11 +54,13 @@ VALUES ('open')
 RETURNING id;
 
 -- name: UpdateChatStatus :exec
-UPDATE chats SET status = $2
+UPDATE chats
+SET status = $2
 WHERE id = $1;
 
 -- name: DeleteChat :one
-DELETE FROM chats
+DELETE
+FROM chats
 WHERE id = $1;
 
 -- name: ListAllMessagesByChatId :one
@@ -73,20 +75,87 @@ VALUES ($1, $2, $3)
 RETURNING *;
 
 -- name: ListAllOrders :many
-SELECT * FROM orders;
+SELECT *
+FROM orders;
 
 -- name: ListAllOrdersByUserId :many
-SELECT * FROM orders
-WHERE user_id=$1;
+SELECT *
+FROM orders
+WHERE user_id = $1;
 
 -- name: GetOrderById :one
-SELECT * FROM orders
-WHERE  id=$1 LIMIT 1;
+SELECT *
+FROM orders
+WHERE id = $1
+LIMIT 1;
+
+-- name: CreateOrder :one
+INSERT INTO orders (user_id, status)
+VALUES ($1, $2);
 
 -- name: UpdateOrderStatus :exec
-UPDATE orders SET status =$2
-WHERE  id = $1;
+UPDATE orders
+SET status =$2
+WHERE id = $1;
 
 -- name: DeleteOrder :exec
-DELETE from orders
-where id=$1;
+DELETE
+FROM orders
+WHERE id = $1;
+
+-- name: GetOrderDetailsById :one
+SELECT *
+FROM order_details
+WHERE order_id = $1
+LIMIT 1;
+
+-- name: UpdateOrderDetails :exec
+UPDATE order_details
+SET address         = $2,
+    phone_number=$3,
+    return_statement=$4
+WHERE order_id = $1;
+
+-- name: ListAllOrderItemsById :many
+SELECT *
+FROM order_items
+WHERE order_id = $1;
+
+-- name: GetOrderItemById :one
+SELECT *
+FROM order_details
+WHERE id = $1;
+
+-- name: UpdateOrderItemById :exec
+UPDATE order_items
+SET quantity=$2,
+    price_at_purchase=$3
+WHERE id = $1;
+
+-- name: DeleteOrderItem :exec
+DELETE
+FROM order_items
+WHERE id = $1;
+
+-- name: ListAllItems :many
+SELECT *
+FROM products;
+
+-- name: GetProductById :one
+SELECT *
+FROM products
+WHERE id = $1
+LIMIT 1;
+
+-- name: UpdateProduct :exec
+UPDATE products
+SET name= $2,
+    price=$3,
+    discount=$4,
+    description=$5
+WHERE id = $1;
+
+-- name: DeleteProduct :exec
+DELETE
+FROM products
+WHERE id = $1;
