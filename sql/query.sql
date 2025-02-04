@@ -58,7 +58,7 @@ UPDATE chats
 SET status = $2
 WHERE id = $1;
 
--- name: DeleteChat :one
+-- name: DeleteChat :exec
 DELETE
 FROM chats
 WHERE id = $1;
@@ -89,7 +89,7 @@ FROM orders
 WHERE id = $1
 LIMIT 1;
 
--- name: CreateOrder :one
+-- name: CreateOrder :exec
 INSERT INTO orders (user_id, status)
 VALUES ($1, $2);
 
