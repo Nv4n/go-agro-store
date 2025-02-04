@@ -15,24 +15,27 @@
             rel="stylesheet"
         />
 
-        <link rel="stylesheet" href="style.css" />
+        <!-- <link rel="stylesheet" href="style.css" /> -->
+        <link rel="stylesheet" href="output.css" />
         <title>Document</title>
     </head>
-    <body>
-        <header>
-            <div class="logo">
+    <body class="font-montserrat text-secondary-400">
+        <header
+            class="flex p-4 text-base justify-between sm:text-xl xl:text-3xl"
+        >
+            <div class="flex text-primary-400 gap-4">
                 <i class="fa-solid fa-leaf"></i>
                 <h1>AgroStore</h1>
             </div>
 
             <nav>
-                <ul class="navlist">
-                    <li>
+                <ul class="flex gap-4 justify-between">
+                    <li class="relative after:content-['|']">
                         <a href="#">
                             <i class="fa-solid fa-basket-shopping"></i
                         ></a>
                     </li>
-                    <li>
+                    <li class="relative after:content-['|']">
                         <a href="#">Начална Страница</a>
                     </li>
                     <li>
@@ -46,11 +49,17 @@
                 <a href="#"></a>
             </div>
             <section>
-                <div class="info-block">
-                    <img src="./img/undraw_gardening.svg" alt="product" />
-                    <div><h2>Ексклузивна оферта</h2>
-                        <span>Lorem ipsum dolor sit.</span>
-
+                <div
+                    class="grid p-4 grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mx-auto my-0 mb-4 w-fit content-start rounded-xl relative"
+                >
+                    <img
+                        class="relative w-full -top-6 left-0"
+                        src="./img/undraw_gardening.svg"
+                        alt="product"
+                    />
+                    <div>
+                        <h2 class="text-2xl">Ексклузивна оферта</h2>
+                        <span class="text-base">Lorem ipsum dolor sit.</span>
                     </div>
                 </div>
                 <input type="text" />
