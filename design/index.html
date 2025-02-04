@@ -17,6 +17,7 @@
 
         <!-- <link rel="stylesheet" href="style.css" /> -->
         <link rel="stylesheet" href="output.css" />
+        <script src="./main.js" defer></script>
         <title>Document</title>
     </head>
     <body class="font-montserrat text-secondary-400">
@@ -42,11 +43,11 @@
                 </ul>
             </nav>
         </header>
-        <main class="flex flex-col mx-5 md:mx-24 lg:mx-52">
+        <main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
             <div class="chat-container">
                 <a href="#"></a>
             </div>
-            <section class="col-span-full mx-auto">
+            <section class="mx-auto">
                 <div
                     class="grid p-4 grid-cols-2 lg:grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mb-4 w-fit content-start rounded-xl relative"
                 >
@@ -57,12 +58,26 @@
                     />
                     <div>
                         <h2 class="text-2xl">Ексклузивна оферта</h2>
-                        <span class="text-base">Lorem ipsum dolor sit.</span>
+                        <span>Lorem ipsum dolor sit.</span>
                     </div>
                 </div>
-                <input class="w-full" type="text" />
+                <form
+                    id="search-form"
+                    class="w-full border p-4.5 flex gap-2 rounded-xl"
+                    method="post"
+                    action="#"
+                >
+                    <button class="text-xl cursor-pointer" type="submit">
+                        <i class="ti ti-search"></i>
+                    </button>
+                    <input
+                        id="search-input"
+                        class="w-full text-lg focus:border-none focus:outline-none"
+                        type="text"
+                    />
+                </form>
             </section>
-            <section class="grid grid-cols-3">
+            <section class="grid grid-cols-3 text-xl">
                 <a
                     class="flex flex-col items-center text-primary-400 font-bold cursor-pointer"
                 >
@@ -78,25 +93,28 @@
                     <span>Почва</span>
                 </a>
             </section>
-
-            <section>
-                <div>
-                    <img src="" alt="product" />
-                </div>
-                <div>
-                    <img src="" alt="product" />
-                </div>
-                <div>
-                    <img src="" alt="product" />
-                </div>
-                <div>
-                    <img src="" alt="product" />
-                </div>
-                <div>
-                    <img src="" alt="product" />
-                </div>
-                <div>
-                    <img src="" alt="product" />
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-11 text-xl">
+                <div class="flex justify-between bg-item1-400 rounded-2xl">
+                    <img
+                        class="w-28 -mt-6 rounded-t-4xl rounded-bl-2xl"
+                        src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="product"
+                    />
+                    <div class="flex justify-between flex-col py-3">
+                        <div>
+                            <h2 class="font-bold">Ola polka</h2>
+                            <span>Tomato</span>
+                        </div>
+                        <div class="flex gap-2 font-bold text-2xl">
+                            <i class="ti ti-currency-som"></i><span>5.9</span>
+                        </div>
+                    </div>
+                    <a
+                        href="#"
+                        class="flex items-center bg-item1-700 rounded-l-[82rem] rounded-r-2xl pl-9 pr-6 py-1 text-white text-4xl cursor-pointer"
+                    >
+                        <span>+</span>
+                    </a>
                 </div>
             </section>
         </main>
