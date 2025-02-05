@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "../../node_modules/tailwindcss";
 
 @theme {
     --font-montserrat: "Montserrat Alternates", serif;
