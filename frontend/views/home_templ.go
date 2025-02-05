@@ -33,18 +33,6 @@ func ProductsPage(products []sqlcDb.Product) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<body>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = header().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = main().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
 		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -57,17 +45,47 @@ func ProductsPage(products []sqlcDb.Product) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script defer>\n\t(() => {\n\t\tdocument\n\t\t\t.getElementById(\"search-form\")\n\t\t\t.addEventListener(\"click\", function (event) {\n\t\t\t\tconst input = document.getElementById(\"search-input\");\n\t\t\t\tif (event.target !== input && event.target.type !== \"submit\") {\n\t\t\t\t\tinput.focus();\n\t\t\t\t}\n\t\t\t});\n\t})();  \n\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<body>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = header().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = main().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var3 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+				if !templ_7745c5c3_IsBuffer {
+					defer func() {
+						templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err == nil {
+							templ_7745c5c3_Err = templ_7745c5c3_BufErr
+						}
+					}()
+				}
+				ctx = templ.InitializeContext(ctx)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script defer>\n\t(() => {\n\t\tdocument\n\t\t\t.getElementById(\"search-form\")\n\t\t\t.addEventListener(\"click\", function (event) {\n\t\t\t\tconst input = document.getElementById(\"search-input\");\n\t\t\t\tif (event.target !== input && event.target.type !== \"submit\") {\n\t\t\t\t\tinput.focus();\n\t\t\t\t}\n\t\t\t});\n\t})();  \n\t\t</script>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				return nil
+			})
+			templ_7745c5c3_Err = homeHandle.Once().Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</body>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = homeHandle.Once().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</body>")
+		templ_7745c5c3_Err = pageWrapper().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -91,9 +109,9 @@ func searchBar() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form id=\"search-form\" class=\"w-full border p-4.5 flex gap-2 rounded-xl\" method=\"post\" action=\"/products/search\"><button class=\"text-xl cursor-pointer\" type=\"submit\"><i class=\"ti ti-search\"></i></button> <input id=\"search-input\" class=\"w-full text-lg focus:border-none focus:outline-none\" type=\"text\"></form>")
@@ -120,21 +138,21 @@ func productComponent(p sqlcDb.Product) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var4 == nil {
-			templ_7745c5c3_Var4 = templ.NopComponent
+		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var5 == nil {
+			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex justify-between bg-item1-400 rounded-2xl\"><img class=\"w-28 -mt-6 rounded-t-4xl rounded-bl-2xl\" src=\"https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&amp;w=1904&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\" alt=\"product\"> <a href=\"#\" class=\"flex justify-between flex-col py-3\"><div><h2 class=\"font-bold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 55, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 57, Col: 34}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -142,12 +160,12 @@ func productComponent(p sqlcDb.Product) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description.String)
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description.String)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 56, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 58, Col: 32}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -155,12 +173,12 @@ func productComponent(p sqlcDb.Product) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Price.Int.String())
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.Price.Int.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 59, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 61, Col: 66}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -188,12 +206,20 @@ func mainCompoment(products []sqlcDb.Product) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<main class=\"flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm\"><div class=\"chat-container\"><a href=\"/chat\"></a></div><section class=\"mx-auto\"><div class=\"grid p-4 grid-cols-2 lg:grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mb-4 w-fit content-start rounded-xl relative\"><img class=\"relative w-full -top-6 left-0\" src=\"img/undraw_gardening.svg\" alt=\"product\"><div><h2 class=\"text-2xl\">Ексклузивна оферта</h2><span>Lorem ipsum dolor sit.</span></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<main class=\"flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = chat().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<section class=\"mx-auto\"><div class=\"grid p-4 grid-cols-2 lg:grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mb-4 w-fit content-start rounded-xl relative\"><img class=\"relative w-full -top-6 left-0\" src=\"img/undraw_gardening.svg\" alt=\"product\"><div><h2 class=\"text-2xl\">Добре дошли</h2><span>Приятно пазаруване</span></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -201,7 +227,7 @@ func mainCompoment(products []sqlcDb.Product) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</section><section class=\"grid grid-cols-3 text-xl mb-6\"><a class=\"flex flex-col items-center text-primary-400 font-bold cursor-pointer\"><i class=\"ti ti-seedling text-4xl\"></i> <span class=\"underline\">Семена</span></a> <a class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-shovel-pitchforks text-4xl\"></i> <span>Оборудване</span></a> <a class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-sandbox text-4xl\"></i> <span>Почва</span></a></section><section class=\"grid grid-cols-1 md:grid-cols-3 gap-11 text-xl\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</section><section class=\"grid grid-cols-3 text-xl mb-6\"><a href=\"/products?=\" class=\"flex flex-col items-center text-primary-400 font-bold cursor-pointer\"><i class=\"ti ti-seedling text-4xl\"></i> <span class=\"underline\">Семена</span></a> <a class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-shovel-pitchforks text-4xl\"></i> <span>Оборудване</span></a> <a class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-sandbox text-4xl\"></i> <span>Почва</span></a></section><section class=\"grid grid-cols-1 md:grid-cols-3 gap-11 text-xl\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -211,7 +237,7 @@ func mainCompoment(products []sqlcDb.Product) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</section></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</section></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

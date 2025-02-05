@@ -5,11 +5,12 @@ import sqlcDb "agro.store/backend/db"
 var homeHandle = templ.NewOnceHandle()
 
 templ ProductsPage(products []sqlcDb.Product) {
-	<body>
-		@header()
-		@main()
-		@homeHandle.Once() {
-			<script defer>
+	@pageWrapper() {
+		<body>
+			@header()
+			@main()
+			@homeHandle.Once() {
+				<script defer>
 	(() => {
 		document
 			.getElementById("search-form")
@@ -21,8 +22,9 @@ templ ProductsPage(products []sqlcDb.Product) {
 			});
 	})();  
 		</script>
-		}
-	</body>
+			}
+		</body>
+	}
 }
 
 templ searchBar() {
@@ -70,9 +72,7 @@ templ productComponent(p sqlcDb.Product) {
 
 templ mainCompoment(products []sqlcDb.Product) {
 	<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
-		<div class="chat-container">
-			<a href="/chat"></a>
-		</div>
+		@chat()
 		<section class="mx-auto">
 			<div
 				class="grid p-4 grid-cols-2 lg:grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mb-4 w-fit content-start rounded-xl relative"
@@ -83,15 +83,15 @@ templ mainCompoment(products []sqlcDb.Product) {
 					alt="product"
 				/>
 				<div>
-					<h2 class="text-2xl">Ексклузивна оферта</h2>
-					<span>Lorem ipsum dolor sit.</span>
+					<h2 class="text-2xl">Добре дошли</h2>
+					<span>Приятно пазаруване</span>
 				</div>
 			</div>
 			@searchBar()
 		</section>
 		<section class="grid grid-cols-3 text-xl mb-6">
 			<a
-			href="/products?="
+				href="/products?="
 				class="flex flex-col items-center text-primary-400 font-bold cursor-pointer"
 			>
 				<i class="ti ti-seedling text-4xl"></i>
