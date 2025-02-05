@@ -3,18 +3,18 @@ package components
 var currentPageCss = "text-secondary-700"
 
 templ navItem(currentPage string, targetPage string) {
-	if currentPage == targetPage {
-		<li class="relative after:content-['|'] text-secondary-700">
-			{ children... }
-		</li>
-	} else {
-		<li class="relative after:content-['|']">
-			{ children... }
-		</li>
-	}
+	<li
+		if currentPage == targetPage {
+			class="relative after:content-['|'] text-secondary-700"
+		} else {
+			class="relative after:content-['|']"
+		}
+	>
+		{ children... }
+	</li>
 }
 
-templ header(currentPage string) {
+templ headerComponent(currentPage string) {
 	<header
 		class="flex p-4 text-base justify-between sm:text-xl xl:text-3xl"
 	>
