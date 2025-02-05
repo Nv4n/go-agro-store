@@ -49,8 +49,8 @@ SELECT *
 FROM chats;
 
 -- name: CreateChat :one
-INSERT INTO chats (status)
-VALUES ('open')
+INSERT INTO chats (status, created_by)
+VALUES ('open', $1)
 RETURNING id;
 
 -- name: UpdateChatStatus :exec

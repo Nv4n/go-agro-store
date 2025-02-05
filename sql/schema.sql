@@ -35,6 +35,7 @@ CREATE TABLE chats
 (
     id         UUID PRIMARY KEY         DEFAULT gen_random_uuid(),
     status     CHAT_STATUS NOT NULL,
+    created_by UUID        NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
