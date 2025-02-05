@@ -9,8 +9,8 @@
     "emmet.includeLanguages": {
         "templ": "html"
     },
-    "templ.log": "/Users/adrian/templ.log",
-    "templ.goplsLog": "/Users/adrian/gopls.log",
+    "templ.log": "/Users/Sybatron/templ.log",
+    "templ.goplsLog": "/Users/Sybatron/gopls.log",
     "templ.http": "localhost:7575",
     "templ.goplsRPCTrace": true,
     "templ.pprof": false,
