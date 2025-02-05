@@ -1,62 +1,27 @@
-package backend
+package main
 
 import (
 	"agro.store/backend/pgstore"
-	"database/sql"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	// Adjust this import to your local module path for the updated pgstore.
 )
 
-// global session store variable
 var sessionStore *pgstore.PGStore
 
-// initSessionStore initializes the session store and creates the sessions table if needed.
-func initSessionStore(dsn string, key []byte) {
-	// Open the database using pgx as the driver
-	db, err := sql.Open("pgx", dsn)
-	if err != nil {
-		log.Fatalf("Failed to open database: %v", err)
-	}
-
-	// Create sessions table if it does not exist.
-	createSessionsTable(db)
-
-	// Initialize the PGStore. pgstore.NewPGStore uses a *sql.DB so pgx works here.
-	store, err := pgstore.NewPGStore(db, key)
-	if err != nil {
-		log.Fatalf("Failed to create PGStore: %v", err)
-	}
-	sessionStore = store
-}
-
-// createSessionsTable creates the table that will hold session records.
-func createSessionsTable(db *sql.DB) {
-	// Adjust this SQL statement to match the expected schema by pgstore.
-	const query = `
-	CREATE TABLE IF NOT EXISTS http_sessions (
-		key TEXT PRIMARY KEY,
-		data BYTEA NOT NULL,
-		expiry TIMESTAMP NOT NULL
-	);
-	`
-	if _, err := db.Exec(query); err != nil {
-		log.Fatalf("Failed to create sessions table: %v", err)
-	}
-}
-
-// authMiddleware uses the session store to check if a valid session exists.
+// authMiddleware checks for a valid session stored in our PostgreSQL using the modernized pgstore.
 func authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Retrieve session using Gorilla sessions.
+		// Retrieve the session using the new PGStore Get method.
 		session, err := sessionStore.Get(c.Request, "session-name")
 		if err != nil || session.IsNew {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
 		}
-
-		// Save user id in the context if it exists.
+		// Expect that a valid session contains a "userID" value.
 		if userID, ok := session.Values["userID"]; ok {
 			c.Set("userID", userID)
 		} else {
@@ -67,11 +32,11 @@ func authMiddleware() gin.HandlerFunc {
 	}
 }
 
-// Stub middleware: only allows admins.
+// adminMiddleware is a stub for routes restricted to administrators.
 func adminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Insert your admin-check logic here. This is just a placeholder.
-		isAdmin := true // Replace with actual check
+		// Replace with your actual admin check.
+		isAdmin := true
 		if !isAdmin {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Admins only"})
 			return
@@ -80,11 +45,11 @@ func adminMiddleware() gin.HandlerFunc {
 	}
 }
 
-// Stub middleware: only allow order owner or admins.
+// orderOwnerOrAdminMiddleware restricts order routes to the order owner or admins.
 func orderOwnerOrAdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Insert logic to check if current user is order owner or admin.
-		isOwnerOrAdmin := true // Replace with actual check
+		// Replace with your actual logic for order ownership.
+		isOwnerOrAdmin := true
 		if !isOwnerOrAdmin {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Not authorized"})
 			return
@@ -94,12 +59,16 @@ func orderOwnerOrAdminMiddleware() gin.HandlerFunc {
 }
 
 func main() {
-	// Replace with your actual PostgreSQL DSN and secret key.
-	dsn := "postgres://username:password@localhost:5432/dbname"
-	secretKey := []byte("your-secret-key")
-	initSessionStore(dsn, secretKey)
+	// Replace with your PostgreSQL DSN and secret key.
+	dbURL := "postgres://username:password@localhost:5432/dbname"
+	var err error
+	sessionStore, err = pgstore.NewPGStore(dbURL, []byte("your-secret-key"))
+	if err != nil {
+		log.Fatalf("failed to initialize pgstore: %v", err)
+	}
+	defer sessionStore.Close()
 
-	// Initialize Gin and load Go templates (using go-templ files under templates/).
+	// Initialize Gin router and load HTML templates.
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 
@@ -114,8 +83,8 @@ func main() {
 	router.GET("/products", func(c *gin.Context) {
 		tag := c.Query("tag")
 		order := c.Query("order")
-		// TODO: query your database for products applying tag and order filters if provided.
-		products := []string{"Product1", "Product2"} // dummy data
+		// TODO: Query your product database applying optional filters.
+		products := []string{"Product1", "Product2"}
 		c.HTML(http.StatusOK, "products.tmpl", gin.H{
 			"products": products,
 			"tag":      tag,
@@ -128,54 +97,57 @@ func main() {
 		c.HTML(http.StatusOK, "create_product.tmpl", nil)
 	})
 	router.POST("/products/create", func(c *gin.Context) {
-		// TODO: create a new product using form data.
+		// TODO: Insert logic to create a new product.
 		c.Redirect(http.StatusFound, "/products")
 	})
 
 	// GET & DELETE /products/:id.
 	router.GET("/products/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: fetch product details by id.
+		// TODO: Retrieve product details.
 		c.HTML(http.StatusOK, "product_detail.tmpl", gin.H{"id": id})
 	})
 	router.DELETE("/products/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: delete the product with the given id.
+		// TODO: Delete the product with the given id.
 		c.JSON(http.StatusOK, gin.H{"status": "deleted", "id": id})
 	})
 
-	// POST /products/:id/buy saves current shopping list in session (simulating localStorage).
+	// POST /products/:id/buy saves the current shopping list in the session.
 	router.POST("/products/:id/buy", func(c *gin.Context) {
 		id := c.Param("id")
-		session, _ := sessionStore.Get(c.Request, "session-name")
-		// Retrieve existing shopping list if available.
+		session, err := sessionStore.Get(c.Request, "session-name")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Session error"})
+			return
+		}
+		// Retrieve or initialize the shopping list.
 		shoppingList, ok := session.Values["shoppingList"].([]string)
 		if !ok {
 			shoppingList = []string{}
 		}
-		// Add product id to shopping list.
 		shoppingList = append(shoppingList, id)
 		session.Values["shoppingList"] = shoppingList
-		if err := session.Save(c.Request, c.Writer); err != nil {
+		if err := sessionStore.Save(c.Request, c.Writer, session); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update shopping list"})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"status": "added to shopping list", "shoppingList": shoppingList})
+		c.JSON(http.StatusOK, gin.H{"status": "added", "shoppingList": shoppingList})
 	})
 
 	// GET & POST /products/:id/edit.
 	router.GET("/products/:id/edit", func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: fetch product for editing.
+		// TODO: Retrieve product for editing.
 		c.HTML(http.StatusOK, "edit_product.tmpl", gin.H{"id": id})
 	})
 	router.POST("/products/:id/edit", func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: update product details using posted form data.
+		// TODO: Update product details.
 		c.Redirect(http.StatusFound, fmt.Sprintf("/products/%s", id))
 	})
 
-	// GET /profile redirects to /users/:id based on the session and shows user dashboard.
+	// GET /profile redirects to /users/:id based on session information.
 	router.GET("/profile", authMiddleware(), func(c *gin.Context) {
 		userID := c.MustGet("userID")
 		c.Redirect(http.StatusFound, fmt.Sprintf("/users/%v", userID))
@@ -188,14 +160,14 @@ func main() {
 	})
 	router.POST("/user/:id/edit", authMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: update user profile using form data.
+		// TODO: Update user profile.
 		c.Redirect(http.StatusFound, fmt.Sprintf("/users/%v", id))
 	})
 
 	// DELETE /user/:id.
 	router.DELETE("/user/:id", authMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: delete the user.
+		// TODO: Delete the user.
 		c.JSON(http.StatusOK, gin.H{"status": "user deleted", "id": id})
 	})
 
@@ -204,13 +176,16 @@ func main() {
 		c.HTML(http.StatusOK, "login.tmpl", nil)
 	})
 	router.POST("/login", func(c *gin.Context) {
-		// TODO: verify user credentials.
-		// For demonstration, assume a field "userID" is posted.
+		// For demonstration, assume a "userID" is provided.
 		userID := c.PostForm("userID")
-		session, _ := sessionStore.Get(c.Request, "session-name")
+		session, err := sessionStore.Get(c.Request, "session-name")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Session error"})
+			return
+		}
 		session.Values["userID"] = userID
-		if err := session.Save(c.Request, c.Writer); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
+		if err := sessionStore.Save(c.Request, c.Writer, session); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not save session"})
 			return
 		}
 		c.Redirect(http.StatusFound, "/profile")
@@ -221,19 +196,19 @@ func main() {
 		c.HTML(http.StatusOK, "register.tmpl", nil)
 	})
 	router.POST("/register", func(c *gin.Context) {
-		// TODO: register the user.
+		// TODO: Add user registration logic.
 		c.Redirect(http.StatusFound, "/login")
 	})
 
-	// Routes restricted to admins for /orders.
+	// Admin-restricted orders routes.
 	ordersGroup := router.Group("/orders", authMiddleware(), adminMiddleware())
 	{
 		ordersGroup.GET("", func(c *gin.Context) {
-			// TODO: list all orders.
+			// TODO: List all orders.
 			c.HTML(http.StatusOK, "orders.tmpl", nil)
 		})
 		ordersGroup.POST("", func(c *gin.Context) {
-			// TODO: create a new order.
+			// TODO: Create a new order.
 			c.Redirect(http.StatusFound, "/orders")
 		})
 	}
@@ -241,16 +216,16 @@ func main() {
 	// GET & POST /orders/:id restricted to order owner and admins.
 	router.GET("/orders/:id", authMiddleware(), orderOwnerOrAdminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: show order details.
+		// TODO: Show order details.
 		c.HTML(http.StatusOK, "order_detail.tmpl", gin.H{"id": id})
 	})
 	router.POST("/orders/:id", authMiddleware(), orderOwnerOrAdminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: update order.
+		// TODO: Update order.
 		c.Redirect(http.StatusFound, fmt.Sprintf("/orders/%s", id))
 	})
 
-	// GET /chat redirects to GET /chats/:id (using the current user id), restricted.
+	// GET /chat redirects to /chats/:id for the current user.
 	router.GET("/chat", authMiddleware(), func(c *gin.Context) {
 		userID := c.MustGet("userID")
 		c.Redirect(http.StatusFound, fmt.Sprintf("/chats/%v", userID))
@@ -258,26 +233,28 @@ func main() {
 
 	// GET & POST /chats.
 	router.GET("/chats", authMiddleware(), func(c *gin.Context) {
-		// TODO: list all chats.
+		// TODO: List all chats.
 		c.HTML(http.StatusOK, "chats.tmpl", nil)
 	})
 	router.POST("/chats", authMiddleware(), func(c *gin.Context) {
-		// TODO: create a new chat.
+		// TODO: Create a new chat.
 		c.Redirect(http.StatusFound, "/chats")
 	})
 
 	// GET & POST /chats/:id/messages.
 	router.GET("/chats/:id/messages", authMiddleware(), func(c *gin.Context) {
 		chatID := c.Param("id")
-		// TODO: fetch messages for chat chatID.
+		// TODO: Retrieve chat messages.
 		c.HTML(http.StatusOK, "chat_messages.tmpl", gin.H{"chatID": chatID})
 	})
 	router.POST("/chats/:id/messages", authMiddleware(), func(c *gin.Context) {
 		chatID := c.Param("id")
-		// TODO: post a new message to chat chatID.
+		// TODO: Post a new message.
 		c.Redirect(http.StatusFound, fmt.Sprintf("/chats/%s/messages", chatID))
 	})
 
 	// Start the server.
-	router.Run(":8080")
+	if err := router.Run(":8080"); err != nil {
+		log.Fatalf("failed to run server: %v", err)
+	}
 }
