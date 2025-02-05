@@ -137,7 +137,7 @@ DELETE
 FROM order_items
 WHERE id = $1;
 
--- name: ListAllItems :many
+-- name: ListAllProducts :many
 SELECT *
 FROM products;
 

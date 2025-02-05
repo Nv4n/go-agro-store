@@ -319,39 +319,6 @@ func (q *Queries) ListAllChats(ctx context.Context) (Chat, error) {
 	return i, err
 }
 
-const listAllItems = `-- name: ListAllItems :many
-SELECT id, name, price, discount, description, created_at, updated_at
-FROM products
-`
-
-func (q *Queries) ListAllItems(ctx context.Context) ([]Product, error) {
-	rows, err := q.db.Query(ctx, listAllItems)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Product
-	for rows.Next() {
-		var i Product
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Price,
-			&i.Discount,
-			&i.Description,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const listAllMessagesByChatId = `-- name: ListAllMessagesByChatId :one
 SELECT id, chat_id, user_id, content, created_at, updated_at
 FROM messages
@@ -456,6 +423,39 @@ func (q *Queries) ListAllOrdersByUserId(ctx context.Context, userID pgtype.UUID)
 			&i.ID,
 			&i.UserID,
 			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAllProducts = `-- name: ListAllProducts :many
+SELECT id, name, price, discount, description, created_at, updated_at
+FROM products
+`
+
+func (q *Queries) ListAllProducts(ctx context.Context) ([]Product, error) {
+	rows, err := q.db.Query(ctx, listAllProducts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Product
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			&i.Discount,
+			&i.Description,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
