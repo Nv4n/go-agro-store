@@ -14,25 +14,24 @@
             href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates&display=swap"
             rel="stylesheet"
         />
-
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="output.css" />
         <title>Document</title>
     </head>
-    <body>
-        <header>
-            <div class="logo">
+    <body class="font-montserrat text-secondary-400">
+        <header
+            class="flex p-4 text-base justify-between sm:text-xl xl:text-3xl"
+        >
+            <div class="flex text-primary-400 gap-4">
                 <i class="ti ti-leaf"></i>
                 <h1>AgroStore</h1>
             </div>
 
             <nav>
-                <ul class="navlist">
-                    <li>
-                        <a href="#">
-                            <i class="fa-solid fa-basket-shopping"></i
-                        ></a>
+                <ul class="flex gap-4 justify-between">
+                    <li class="relative after:content-['|']">
+                        <a href="#"> <i class="ti ti-shopping-bag"></i></a>
                     </li>
-                    <li>
+                    <li class="relative after:content-['|']">
                         <a href="#">Начална Страница</a>
                     </li>
                     <li>
@@ -41,40 +40,59 @@
                 </ul>
             </nav>
         </header>
-        <main>
-            <div class="chat-container">
-                <a href="#"></a>
+        <main
+            class="flex flex-col relative mx-5 md:mx-24 lg:mx-52 gap-6 text-sm"
+        >
+            <div
+                class="w-fit fixed text-6xl border rounded-xl bottom-8 right-8"
+            >
+                <a href="/chat"><i class="ti ti-message-circle-user"></i></a>
             </div>
-            <section>
-                <div class="info-block">
-                    <img src="img/undraw_gardening.svg" alt="product" />
+            <section
+                class="grid grid-cols-2 grid-flow-row justify-between bg-item1-400 rounded-bl-[2.5rem] p-4"
+            >
+                <div>
+                    <span class="font-bold">Seeds</span>
+                    <h2 class="text-4xl text-secondary-700">Ola Polka</h2>
+                </div>
+                <img
+                    class="w-56 object-cover justify-self-end row-span-3 col-start-2 -m-4"
+                    src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="product-image"
+                />
+                <div>
                     <div>
-                        <h2>Ексклузивна оферта</h2>
-                        <span>Lorem ipsum dolor sit.</span>
+                        <span class="capitalize text-xs font-bold">price</span>
+                        <div class="flex gap-2 font-bold text-2xl">
+                            <i class="ti ti-currency-som"></i><span>5.9</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="capitalize text-xs font-bold">type</span>
+                        <div class="flex gap-2 font-bold text-2xl">
+                            <i class="ti ti-currency-som"></i><span>Домат</span>
+                        </div>
                     </div>
                 </div>
-                <input type="text" />
+                <form action="./buy" method="post">
+                    <button
+                        type="submit"
+                        class="bg-primary-400 text-white text-4xl rounded-xl p-2.5 cursor-pointer"
+                    >
+                        <i class="ti ti-shopping-bag-plus"></i>
+                    </button>
+                </form>
             </section>
             <section>
-                <a href="#">
-                    <span>Семена</span>
-                </a>
-                <a href="#">
-                    <span>Оборудване</span>
-                </a>
-                <a href="#">
-                    <span>Почва</span>
-                </a>
-            </section>
-            <section>
-                <div>
-                    <img src="" alt="product" />
-                </div>
-                <div>
-                    <img src="" alt="product" />
-                </div>
+                <h3 class="text-xl font-bold text-secondary-700">Описание</h3>
+                <p>
+                    The Monstera Adansonii grows best in a well-draining Aroid
+                    mix using bark, perlite, peat moss, and charcoal. Keep your
+                    plant in bright indirect light and humidity above 60%. When
+                    watering, make sure that the potting mix of your Adansonii
+                    remains slightly moist
+                </p>
             </section>
         </main>
-        <footer></footer>
     </body>
 </html>
