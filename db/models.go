@@ -272,6 +272,7 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 type Chat struct {
 	ID        pgtype.UUID
 	Status    ChatStatus
+	CreatedBy pgtype.UUID
 	CreatedAt pgtype.Timestamptz
 	UpdatedAt pgtype.Timestamptz
 }

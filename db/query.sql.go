@@ -12,13 +12,13 @@ import (
 )
 
 const createChat = `-- name: CreateChat :one
-INSERT INTO chats (status)
-VALUES ('open')
+INSERT INTO chats (status, created_by)
+VALUES ('open', $1)
 RETURNING id
 `
 
-func (q *Queries) CreateChat(ctx context.Context) (pgtype.UUID, error) {
-	row := q.db.QueryRow(ctx, createChat)
+func (q *Queries) CreateChat(ctx context.Context, createdBy pgtype.UUID) (pgtype.UUID, error) {
+	row := q.db.QueryRow(ctx, createChat, createdBy)
 	var id pgtype.UUID
 	err := row.Scan(&id)
 	return id, err
@@ -148,7 +148,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getChatById = `-- name: GetChatById :one
-SELECT id, status, created_at, updated_at
+SELECT id, status, created_by, created_at, updated_at
 from chats
 WHERE id = $1
 `
@@ -159,6 +159,7 @@ func (q *Queries) GetChatById(ctx context.Context, id pgtype.UUID) (Chat, error)
 	err := row.Scan(
 		&i.ID,
 		&i.Status,
+		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -173,9 +174,16 @@ WHERE C.status = 'open'
   AND M.user_id = $1
 `
 
-func (q *Queries) GetOpenChatByUserId(ctx context.Context, userID pgtype.UUID) (Chat, error) {
+type GetOpenChatByUserIdRow struct {
+	ID        pgtype.UUID
+	Status    ChatStatus
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+}
+
+func (q *Queries) GetOpenChatByUserId(ctx context.Context, userID pgtype.UUID) (GetOpenChatByUserIdRow, error) {
 	row := q.db.QueryRow(ctx, getOpenChatByUserId, userID)
-	var i Chat
+	var i GetOpenChatByUserIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.Status,
@@ -294,7 +302,7 @@ func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (User, error)
 }
 
 const listAllChats = `-- name: ListAllChats :one
-SELECT id, status, created_at, updated_at
+SELECT id, status, created_by, created_at, updated_at
 FROM chats
 `
 
@@ -304,6 +312,7 @@ func (q *Queries) ListAllChats(ctx context.Context) (Chat, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Status,
+		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
