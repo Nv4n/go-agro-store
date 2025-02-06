@@ -277,23 +277,6 @@ type Chat struct {
 	UpdatedAt pgtype.Timestamptz
 }
 
-type Delivery struct {
-	ID                pgtype.UUID
-	OrderID           pgtype.UUID
-	Status            DeliveryStatus
-	TrackingNumber    pgtype.Text
-	EstimatedDelivery pgtype.Timestamptz
-	DeliveredAt       pgtype.Timestamptz
-	CreatedAt         pgtype.Timestamptz
-	UpdatedAt         pgtype.Timestamptz
-}
-
-type Favorite struct {
-	UserID    pgtype.UUID
-	ProductID pgtype.UUID
-	CreatedAt pgtype.Timestamptz
-}
-
 type Message struct {
 	ID        pgtype.UUID
 	ChatID    pgtype.UUID
@@ -336,25 +319,10 @@ type Product struct {
 	Price       pgtype.Numeric
 	Discount    pgtype.Numeric
 	Description pgtype.Text
+	Type        pgtype.UUID
+	Category    pgtype.UUID
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
-}
-
-type ProductInteraction struct {
-	ID         pgtype.UUID
-	ProductID  pgtype.UUID
-	UserID     pgtype.UUID
-	Type       ProdInteractionType
-	Content    string
-	IsAnswered pgtype.Bool
-	Response   pgtype.Text
-	CreatedAt  pgtype.Timestamptz
-	UpdatedAt  pgtype.Timestamptz
-}
-
-type ProductTag struct {
-	ProductID pgtype.UUID
-	TagID     pgtype.UUID
 }
 
 type Tag struct {

@@ -257,15 +257,37 @@ func (q *Queries) GetOrderItemById(ctx context.Context, id pgtype.UUID) (OrderDe
 }
 
 const getProductById = `-- name: GetProductById :one
-SELECT id, name, price, discount, description, created_at, updated_at
-FROM products
-WHERE id = $1
+SELECT DISTINCT P.id,
+                P.name,
+                P.price,
+                P.discount,
+                P.description,
+                P.created_at,
+                P.updated_at,
+                TYP.name as type,
+                CAT.name as category
+FROM products P
+         JOIN tags TYP on TYP.id = P.type
+         JOIN tags CAT on CAT.id = P.category
+WHERE P.id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetProductById(ctx context.Context, id pgtype.UUID) (Product, error) {
+type GetProductByIdRow struct {
+	ID          pgtype.UUID
+	Name        string
+	Price       pgtype.Numeric
+	Discount    pgtype.Numeric
+	Description pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+	Type        string
+	Category    string
+}
+
+func (q *Queries) GetProductById(ctx context.Context, id pgtype.UUID) (GetProductByIdRow, error) {
 	row := q.db.QueryRow(ctx, getProductById, id)
-	var i Product
+	var i GetProductByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -274,6 +296,8 @@ func (q *Queries) GetProductById(ctx context.Context, id pgtype.UUID) (Product, 
 		&i.Description,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Type,
+		&i.Category,
 	)
 	return i, err
 }
@@ -437,19 +461,41 @@ func (q *Queries) ListAllOrdersByUserId(ctx context.Context, userID pgtype.UUID)
 }
 
 const listAllProducts = `-- name: ListAllProducts :many
-SELECT id, name, price, discount, description, created_at, updated_at
-FROM products
+SELECT DISTINCT P.id,
+                P.name,
+                P.price,
+                P.discount,
+                P.description,
+                P.created_at,
+                P.updated_at,
+                TYP.name as type,
+                CAT.name as category
+FROM products P
+         JOIN tags TYP on TYP.id = P.type
+         JOIN tags CAT on CAT.id = P.category
 `
 
-func (q *Queries) ListAllProducts(ctx context.Context) ([]Product, error) {
+type ListAllProductsRow struct {
+	ID          pgtype.UUID
+	Name        string
+	Price       pgtype.Numeric
+	Discount    pgtype.Numeric
+	Description pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+	Type        string
+	Category    string
+}
+
+func (q *Queries) ListAllProducts(ctx context.Context) ([]ListAllProductsRow, error) {
 	rows, err := q.db.Query(ctx, listAllProducts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Product
+	var items []ListAllProductsRow
 	for rows.Next() {
-		var i Product
+		var i ListAllProductsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -458,6 +504,8 @@ func (q *Queries) ListAllProducts(ctx context.Context) ([]Product, error) {
 			&i.Description,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Type,
+			&i.Category,
 		); err != nil {
 			return nil, err
 		}
@@ -654,6 +702,34 @@ type UpdateUserPassParams struct {
 
 func (q *Queries) UpdateUserPass(ctx context.Context, arg UpdateUserPassParams) (User, error) {
 	row := q.db.QueryRow(ctx, updateUserPass, arg.ID, arg.Password)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Fname,
+		&i.Lname,
+		&i.Password,
+		&i.Role,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateUserRole = `-- name: UpdateUserRole :one
+UPDATE users
+SET role = $2
+WHERE id = $1
+RETURNING id, email, fname, lname, password, role, created_at, updated_at
+`
+
+type UpdateUserRoleParams struct {
+	ID   pgtype.UUID
+	Role UserRole
+}
+
+func (q *Queries) UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserRole, arg.ID, arg.Role)
 	var i User
 	err := row.Scan(
 		&i.ID,
