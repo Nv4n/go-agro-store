@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+    --font-montserrat: "Montserrat Alternates", serif;
+    --primary-pad: 1rem;
+    --primary-radius: 0.8rem;
+
+    --color-primary-400: #0d986a;
+    --color-secondary-400: #435b71;
+    --color-secondary-700: #002140;
+
+    --color-item1-400: #dbe7d5;
+    --color-item1-700: #bfd5b4;
+    --color-item2-400: #d5e3e7;
+    --color-item2-700: #b4ced5;
+    --color-item3-400: #f9d7be;
+    --color-item3-700: #f5bb8f;
+}
+
+@config "../tailwind.config.mjs";
