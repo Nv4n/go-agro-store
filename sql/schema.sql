@@ -102,22 +102,23 @@ CREATE TABLE order_items
 
 CREATE TYPE DELIVERY_STATUS AS ENUM ('shipped','in transit','delivered','returned');
 
-CREATE TABLE deliveries
-(
-    id                 UUID PRIMARY KEY         DEFAULT gen_random_uuid(),
-    order_id           UUID            NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
-    status             DELIVERY_STATUS NOT NULL,
-    tracking_number    VARCHAR(100),
-    estimated_delivery TIMESTAMP WITH TIME ZONE,
-    delivered_at       TIMESTAMP WITH TIME ZONE,
-    created_at         TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at         TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-CREATE TRIGGER update_deliveries_updated_at
-    BEFORE UPDATE
-    ON deliveries
-    FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+-- CREATE TABLE deliveries
+-- (
+--     id                 UUID PRIMARY KEY         DEFAULT gen_random_uuid(),
+--     order_id           UUID            NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
+--     status             DELIVERY_STATUS NOT NULL,
+--     tracking_number    VARCHAR(100),
+--     estimated_delivery TIMESTAMP WITH TIME ZONE,
+--     delivered_at       TIMESTAMP WITH TIME ZONE,
+--     created_at         TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+--     updated_at         TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- );
+--
+-- CREATE TRIGGER update_deliveries_updated_at
+--     BEFORE UPDATE
+--     ON deliveries
+--     FOR EACH ROW
+-- EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TABLE products
 (
@@ -126,6 +127,8 @@ CREATE TABLE products
     price       DECIMAL(10, 2) NOT NULL,
     discount    DECIMAL(5, 2) CHECK (discount >= 0 AND discount <= 100),
     description TEXT,
+    type        UUID           NOT NULL REFERENCES tags (id),
+    category    UUID           NOT NULL REFERENCES tags (id),
     created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -152,49 +155,42 @@ CREATE TRIGGER update_tags_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TABLE product_tags
-(
-    product_id UUID NOT NULL REFERENCES products (id) ON DELETE CASCADE,
-    tag_id     UUID NOT NULL REFERENCES tags (id) ON DELETE CASCADE,
-    PRIMARY KEY (product_id, tag_id)
-);
-
 CREATE TYPE PROD_INTERACTION_TYPE AS ENUM ('review','question');
 
-CREATE TABLE product_interactions
-(
-    id          UUID PRIMARY KEY         DEFAULT gen_random_uuid(),
-    product_id  UUID                  NOT NULL REFERENCES products (id) ON DELETE CASCADE,
-    user_id     UUID                  REFERENCES users (id) ON DELETE SET NULL,
-    type        PROD_INTERACTION_TYPE NOT NULL,
-    content     TEXT                  NOT NULL,
-    is_answered BOOLEAN                  DEFAULT FALSE,
-    response    TEXT,
-    created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- CREATE TABLE product_interactions
+-- (
+--     id          UUID PRIMARY KEY         DEFAULT gen_random_uuid(),
+--     product_id  UUID                  NOT NULL REFERENCES products (id) ON DELETE CASCADE,
+--     user_id     UUID                  REFERENCES users (id) ON DELETE SET NULL,
+--     type        PROD_INTERACTION_TYPE NOT NULL,
+--     content     TEXT                  NOT NULL,
+--     is_answered BOOLEAN                  DEFAULT FALSE,
+--     response    TEXT,
+--     created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+--     updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- );
 
-CREATE TRIGGER update_prod_interactions_updated_at
-    BEFORE UPDATE
-    ON product_interactions
-    FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+-- CREATE TRIGGER update_prod_interactions_updated_at
+--     BEFORE UPDATE
+--     ON product_interactions
+--     FOR EACH ROW
+-- EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TABLE favorites
-(
-    user_id    UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    product_id UUID NOT NULL REFERENCES products (id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    PRIMARY KEY (user_id, product_id)
-);
+-- CREATE TABLE favorites
+-- (
+--     user_id    UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+--     product_id UUID NOT NULL REFERENCES products (id) ON DELETE CASCADE,
+--     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+--     PRIMARY KEY (user_id, product_id)
+-- );
 
 
 CREATE INDEX idx_products_description_en ON products USING gin (to_tsvector('english', description));
 CREATE INDEX idx_products_description_ru ON products USING gin (to_tsvector('russian', description));
-CREATE INDEX idx_reviews_content_en ON product_interactions USING gin (to_tsvector('english', content));
-CREATE INDEX idx_reviews_content_ru ON product_interactions USING gin (to_tsvector('russian', content));
-CREATE INDEX idx_product_interactions_compound ON product_interactions (product_id, user_id);
+-- CREATE INDEX idx_reviews_content_en ON product_interactions USING gin (to_tsvector('english', content));
+-- CREATE INDEX idx_reviews_content_ru ON product_interactions USING gin (to_tsvector('russian', content));
+-- CREATE INDEX idx_product_interactions_compound ON product_interactions (product_id, user_id);
 CREATE INDEX idx_chat_status ON chats (status);
 CREATE INDEX idx_messages_chat_id ON messages (chat_id);
 CREATE INDEX idx_orders_user_id ON orders (user_id);
-CREATE INDEX idx_product_interactions_product_id ON product_interactions (product_id);
+-- CREATE INDEX idx_product_interactions_product_id ON product_interactions (product_id);

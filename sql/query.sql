@@ -138,13 +138,33 @@ FROM order_items
 WHERE id = $1;
 
 -- name: ListAllProducts :many
-SELECT *
-FROM products;
+SELECT DISTINCT P.id,
+                P.name,
+                P.price,
+                P.discount,
+                P.description,
+                P.created_at,
+                P.updated_at,
+                TYP.name as type,
+                CAT.name as category
+FROM products P
+         JOIN tags TYP on TYP.id = P.type
+         JOIN tags CAT on CAT.id = P.category;
 
 -- name: GetProductById :one
-SELECT *
-FROM products
-WHERE id = $1
+SELECT DISTINCT P.id,
+                P.name,
+                P.price,
+                P.discount,
+                P.description,
+                P.created_at,
+                P.updated_at,
+                TYP.name as type,
+                CAT.name as category
+FROM products P
+         JOIN tags TYP on TYP.id = P.type
+         JOIN tags CAT on CAT.id = P.category
+WHERE P.id = $1
 LIMIT 1;
 
 -- name: UpdateProduct :exec
