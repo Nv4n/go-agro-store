@@ -8,7 +8,7 @@ var homeHandle = templ.NewOnceHandle()
 templ ProductsPage(products []sqlcDb.Product) {
 	@comps.PageWrapper() {
 		<body>
-		    @comps.Header("/products")
+			@comps.Header("/products")
 			@mainComponent(products)
 			@homeHandle.Once() {
 				<script defer>
@@ -56,7 +56,7 @@ templ productComponent(p sqlcDb.Product) {
 		<a href="#" class="flex justify-between flex-col py-3">
 			<div>
 				<h2 class="font-bold">{ p.Name }</h2>
-				<span>{ p.Description.String }</span>
+				<span>{ p.Name }</span>
 			</div>
 			<div class="flex gap-2 font-bold text-2xl">
 				<i class="ti ti-currency-som"></i><span>{ p.Price.Int.String() } 5.9</span>

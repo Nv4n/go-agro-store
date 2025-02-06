@@ -1,9 +1,54 @@
 package views
+
 import comps "agro.store/frontend/views/components"
 
-
 templ LoginPage() {
-    @comps.PageWrapper() {
+	@comps.PageWrapper() {
+		@comps.Header("/login")
+	}
+}
 
-    }
+templ main() {
+	<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
+		<form
+			id="search-form"
+			class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
+			method="post"
+			action="/login"
+		>
+			<div class="flex flex-col w-fit gap-2">
+				<label class="font-bold" for="fname">Име</label>
+				<input
+					id="fname"
+					name="fname"
+					class="border border-secondary-400 p-2 rounded-xl"
+					type="text"
+				/>
+			</div>
+			<div class="flex flex-col w-fit gap-2">
+				<label class="font-bold" for="fname">Име</label>
+				<input
+					id="fname"
+					name="fname"
+					class="border border-secondary-400 p-2 rounded-xl"
+					type="text"
+				/>
+			</div>
+			<div class="flex flex-col w-fit gap-2">
+				<label class="font-bold" for="lname">Фамилия</label>
+				<input
+					id="lname"
+					name="lname"
+					class="border border-secondary-400 p-2 rounded-xl"
+					type="text"
+				/>
+			</div>
+			<button
+				class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
+				type="submit"
+			>
+				Регистрирай се
+			</button>
+		</form>
+	</main>
 }

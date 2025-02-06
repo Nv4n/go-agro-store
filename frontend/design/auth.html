@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+        />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="output.css" />
+        <title>Document</title>
+    </head>
+    <body class="font-montserrat text-secondary-400">
+        <header
+            class="flex p-4 text-base justify-between sm:text-xl xl:text-3xl"
+        >
+            <div class="flex text-primary-400 gap-4">
+                <i class="ti ti-leaf"></i>
+                <h1>AgroStore</h1>
+            </div>
+
+            <nav>
+                <ul class="flex gap-4 justify-between">
+                    <li class="relative after:content-['|']">
+                        <a href="#"> <i class="ti ti-shopping-bag"></i></a>
+                    </li>
+                    <li class="relative after:content-['|']">
+                        <a href="#">Начална Страница</a>
+                    </li>
+                    <li>
+                        <a href="#">Профил</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
+            <form
+                id="search-form"
+                class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
+                method="post"
+                action="/login"
+            >
+                <div class="relative flex flex-col w-fit gap-2">
+                    <label class="font-bold" for="fname">Име</label>
+
+                    <input
+                        id="fname"
+                        name="fname"
+                        class="border border-secondary-400 p-2 rounded-xl"
+                        type="text"
+                    />
+                </div>
+                <div class="flex flex-col w-fit gap-2">
+                    <label class="font-bold" for="fname">Име</label>
+                    <input
+                        id="fname"
+                        name="fname"
+                        class="border border-secondary-400 p-2 rounded-xl"
+                        type="text"
+                    />
+                </div>
+                <div class="flex flex-col w-fit gap-2">
+                    <label class="font-bold" for="fname">Име</label>
+                    <input
+                        id="fname"
+                        name="fname"
+                        class="border border-secondary-400 p-2 rounded-xl"
+                        type="text"
+                    />
+                </div>
+
+                <div class="flex flex-col w-fit gap-2">
+                    <label class="font-bold" for="lname">Фамилия</label>
+                    <input
+                        id="lname"
+                        name="lname"
+                        class="border border-secondary-400 p-2 rounded-xl"
+                        type="text"
+                    />
+                </div>
+                <button
+                    class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
+                    type="submit"
+                >
+                    Регистрирай се
+                </button>
+            </form>
+        </main>
+    </body>
+</html>

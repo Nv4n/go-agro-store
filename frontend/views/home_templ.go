@@ -70,7 +70,7 @@ func ProductsPage(products []sqlcDb.Product) templ.Component {
 					}()
 				}
 				ctx = templ.InitializeContext(ctx)
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script defer>\r\n\t(() => {\r\n\t\tdocument\r\n\t\t\t.getElementById(\"search-form\")\r\n\t\t\t.addEventListener(\"click\", function (event) {\r\n\t\t\t\tconst input = document.getElementById(\"search-input\");\r\n\t\t\t\tif (event.target !== input && event.target.type !== \"submit\") {\r\n\t\t\t\t\tinput.focus();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t})();  \r\n\t\t</script>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script defer>\n\t(() => {\n\t\tdocument\n\t\t\t.getElementById(\"search-form\")\n\t\t\t.addEventListener(\"click\", function (event) {\n\t\t\t\tconst input = document.getElementById(\"search-input\");\n\t\t\t\tif (event.target !== input && event.target.type !== \"submit\") {\n\t\t\t\t\tinput.focus();\n\t\t\t\t}\n\t\t\t});\n\t})();  \n\t\t</script>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -162,9 +162,9 @@ func productComponent(p sqlcDb.Product) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description.String)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 59, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 59, Col: 18}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
