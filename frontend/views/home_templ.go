@@ -9,6 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import sqlcDb "agro.store/backend/db"
+import comps "agro.store/frontend/views/components"
 
 var homeHandle = templ.NewOnceHandle()
 
@@ -49,11 +50,11 @@ func ProductsPage(products []sqlcDb.Product) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = header().Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = comps.Header("/products").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = main().Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = mainComponent(products).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -69,7 +70,7 @@ func ProductsPage(products []sqlcDb.Product) templ.Component {
 					}()
 				}
 				ctx = templ.InitializeContext(ctx)
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script defer>\n\t(() => {\n\t\tdocument\n\t\t\t.getElementById(\"search-form\")\n\t\t\t.addEventListener(\"click\", function (event) {\n\t\t\t\tconst input = document.getElementById(\"search-input\");\n\t\t\t\tif (event.target !== input && event.target.type !== \"submit\") {\n\t\t\t\t\tinput.focus();\n\t\t\t\t}\n\t\t\t});\n\t})();  \n\t\t</script>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script defer>\r\n\t(() => {\r\n\t\tdocument\r\n\t\t\t.getElementById(\"search-form\")\r\n\t\t\t.addEventListener(\"click\", function (event) {\r\n\t\t\t\tconst input = document.getElementById(\"search-input\");\r\n\t\t\t\tif (event.target !== input && event.target.type !== \"submit\") {\r\n\t\t\t\t\tinput.focus();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t})();  \r\n\t\t</script>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -85,7 +86,7 @@ func ProductsPage(products []sqlcDb.Product) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = pageWrapper().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = comps.PageWrapper().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -150,7 +151,7 @@ func productComponent(p sqlcDb.Product) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 57, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 58, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -163,7 +164,7 @@ func productComponent(p sqlcDb.Product) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description.String)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 58, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 59, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -176,7 +177,7 @@ func productComponent(p sqlcDb.Product) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.Price.Int.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 61, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 62, Col: 66}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -190,7 +191,7 @@ func productComponent(p sqlcDb.Product) templ.Component {
 	})
 }
 
-func mainCompoment(products []sqlcDb.Product) templ.Component {
+func mainComponent(products []sqlcDb.Product) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -215,7 +216,7 @@ func mainCompoment(products []sqlcDb.Product) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = chat().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = comps.Chat().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

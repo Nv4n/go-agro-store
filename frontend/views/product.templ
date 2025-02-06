@@ -1,19 +1,21 @@
 package views
 
 import sqlcDb "agro.store/backend/db"
+import comps "agro.store/frontend/views/components"
 
 templ ProductPage(product sqlcDb.Product) {
-	@pageWrapper() {
+	@comps.PageWrapper() {
+		@comps.Header("/products/id")
 		<main
 			class="flex flex-col relative mx-5 md:mx-24 lg:mx-52 gap-6 text-sm"
 		>
-			@chat()
+			@comps.Chat()
 			<section
 				class="grid grid-cols-2 grid-flow-row justify-between bg-item1-400 rounded-bl-[2.5rem] p-4"
 			>
 				<div>
 					<span class="font-bold">Семена</span>
-					<h2 class="text-4xl text-secondary-700">Ola Polka</h2>
+					<h2 class="text-4xl text-secondary-700">{ product.Name }</h2>
 				</div>
 				<img
 					class="w-56 object-cover justify-self-end row-span-3 col-start-2 -m-4"
@@ -24,7 +26,7 @@ templ ProductPage(product sqlcDb.Product) {
 					<div>
 						<span class="capitalize text-xs font-bold">цена</span>
 						<div class="flex gap-2 font-bold text-2xl">
-							<i class="ti ti-currency-som"></i><span>{ product.Price }</span>
+							<i class="ti ti-currency-som"></i><span>{ product.Price.Int.String() }</span>
 						</div>
 					</div>
 					<div>

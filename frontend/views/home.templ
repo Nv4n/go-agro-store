@@ -1,14 +1,15 @@
 package views
 
 import sqlcDb "agro.store/backend/db"
+import comps "agro.store/frontend/views/components"
 
 var homeHandle = templ.NewOnceHandle()
 
 templ ProductsPage(products []sqlcDb.Product) {
-	@pageWrapper() {
+	@comps.PageWrapper() {
 		<body>
-			@header()
-			@main()
+		    @comps.Header("/products")
+			@mainComponent(products)
 			@homeHandle.Once() {
 				<script defer>
 	(() => {
@@ -70,9 +71,9 @@ templ productComponent(p sqlcDb.Product) {
 	</div>
 }
 
-templ mainCompoment(products []sqlcDb.Product) {
+templ mainComponent(products []sqlcDb.Product) {
 	<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
-		@chat()
+		@comps.Chat()
 		<section class="mx-auto">
 			<div
 				class="grid p-4 grid-cols-2 lg:grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mb-4 w-fit content-start rounded-xl relative"
