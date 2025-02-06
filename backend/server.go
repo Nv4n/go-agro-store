@@ -1,9 +1,13 @@
-package main
+package backend
 
 import (
+	"agro.store/backend/db"
+	"agro.store/frontend/views"
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
+	"os"
 
 	"agro.store/backend/pgstore"
 
@@ -59,9 +63,10 @@ func orderOwnerOrAdminMiddleware() gin.HandlerFunc {
 	}
 }
 
-func main() {
+func StartServer() {
+	_ = godotenv.Load()
 	// Replace with your PostgreSQL DSN and secret key.
-	dbURL := "postgres://username:password@localhost:5432/dbname"
+	dbURL := os.Getenv("DB_URI")
 	var err error
 	sessionStore, err = pgstore.NewPGStore(dbURL, []byte("your-secret-key"))
 	if err != nil {
@@ -71,8 +76,7 @@ func main() {
 
 	// Initialize Gin router and load HTML templates.
 	router := gin.Default()
-	router.LoadHTMLGlob("templates/*")
-
+	router.Static("/public", "./public")
 	// --- Route definitions ---
 
 	// GET "/" redirects to /products.
@@ -82,15 +86,11 @@ func main() {
 
 	// GET /products with optional filters: ?tag=...&order=asc|desc|newest
 	router.GET("/products", func(c *gin.Context) {
-		tag := c.Query("tag")
-		order := c.Query("order")
+		//tag := c.Query("tag")
+		//order := c.Query("order")
 		// TODO: Query your product database applying optional filters.
-		products := []string{"Product1", "Product2"}
-		c.HTML(http.StatusOK, "products.tmpl", gin.H{
-			"products": products,
-			"tag":      tag,
-			"order":    order,
-		})
+		var products []db.Product
+		_ = views.ProductsPage(products).Render(c.Request.Context(), c.Writer)
 	})
 
 	// GET & POST /products/create.
