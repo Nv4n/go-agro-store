@@ -1,6 +1,7 @@
 package main
 
 import (
+	server "agro.store/backend"
 	_ "github.com/a-h/templ"
 	_ "github.com/gin-gonic/gin"
 	_ "github.com/gorilla/sessions"
@@ -8,5 +9,5 @@ import (
 )
 
 func main() {
-
+	server.StartServer()
 }
