@@ -5,12 +5,7 @@ import comps "agro.store/frontend/views/components"
 templ LoginPage() {
 	@comps.PageWrapper() {
 		@comps.Header("/login")
-		@main()
-	}
-}
-
-templ main() {
-	<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
+		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
 		@comps.Chat()
 		<form
 			id="search-form"
@@ -28,4 +23,5 @@ templ main() {
 			</button>
 		</form>
 	</main>
+	}
 }
