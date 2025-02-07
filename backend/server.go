@@ -1,18 +1,19 @@
 package backend
 
 import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+
 	"agro.store/backend/db"
 	"agro.store/backend/pgstore"
 	"agro.store/frontend/views"
-	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/joho/godotenv"
-	"log"
-	"net/http"
-	"os"
 )
 
 var sessionStore *pgstore.PGStore
@@ -25,14 +26,18 @@ func authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session, err := sessionStore.Get(c.Request, DefaultSessionName)
 		if err != nil || session.IsNew {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			//c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Redirect(http.StatusFound, "/login")
+			c.Abort()
 			return
 		}
 
 		if userID, ok := session.Values["userID"]; ok {
 			c.Set("userID", userID)
 		} else {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			//c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Redirect(http.StatusFound, "/login")
+			c.Abort()
 			return
 		}
 		c.Next()
@@ -44,23 +49,27 @@ func adminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		unparsedUserID, ok := c.Get("userID")
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Redirect(http.StatusFound, "/")
+			c.Abort()
 			return
 		}
 		userID, ok := unparsedUserID.(pgtype.UUID)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
+			c.Redirect(http.StatusFound, "/")
+			c.Abort()
 			return
 		}
 
 		u, err := dbQueries.GetUserById(c, userID)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
+			c.Redirect(http.StatusFound, "/")
+			c.Abort()
 			return
 		}
 
 		if u.Role != "admin" {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Admins only"})
+			c.Redirect(http.StatusFound, "/")
+			c.Abort()
 			return
 		}
 		c.Next()
