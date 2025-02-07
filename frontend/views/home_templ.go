@@ -220,7 +220,7 @@ func mainComponent(products []sqlcDb.Product) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<section class=\"mx-auto\"><div class=\"grid p-4 grid-cols-2 lg:grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mb-4 w-fit content-start rounded-xl relative\"><img class=\"relative w-full -top-6 left-0\" src=\"/public/img/undraw_gardening.svg\" alt=\"product\"><div><h2 class=\"text-2xl\">Добре дошли</h2><span>Приятно пазаруване</span></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<section class=\"mx-auto\"><div class=\"grid p-4 grid-cols-2 lg:grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mb-4 w-fit content-start rounded-xl relative\"><img class=\"relative w-full -top-6 left-0\" src=\"/upload/undraw_gardening.svg\" alt=\"product\"><div><h2 class=\"text-2xl\">Добре дошли</h2><span>Приятно пазаруване</span></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
