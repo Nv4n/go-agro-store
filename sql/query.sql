@@ -1,11 +1,11 @@
 -- name: GetUserById :one
-SELECT *
+SELECT id, email, fname, lname, role
 FROM users
 WHERE id = $1
 LIMIT 1;
 
 -- name: ListAllUsers :many
-SELECT id, email, fname, lname
+SELECT id, email, fname, lname, role
 FROM users
 ORDER BY fname, lname;
 
