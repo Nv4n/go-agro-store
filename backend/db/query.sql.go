@@ -302,6 +302,26 @@ func (q *Queries) GetProductById(ctx context.Context, id pgtype.UUID) (GetProduc
 	return i, err
 }
 
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, email, password
+FROM users
+WHERE email = $1
+LIMIT 1
+`
+
+type GetUserByEmailRow struct {
+	ID       pgtype.UUID
+	Email    string
+	Password string
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	var i GetUserByEmailRow
+	err := row.Scan(&i.ID, &i.Email, &i.Password)
+	return i, err
+}
+
 const getUserById = `-- name: GetUserById :one
 SELECT id, email, fname, lname, role
 FROM users
