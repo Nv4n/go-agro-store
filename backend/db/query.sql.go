@@ -303,24 +303,29 @@ func (q *Queries) GetProductById(ctx context.Context, id pgtype.UUID) (GetProduc
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, email, fname, lname, password, role, created_at, updated_at
+SELECT id, email, fname, lname, role
 FROM users
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (User, error) {
+type GetUserByIdRow struct {
+	ID    pgtype.UUID
+	Email string
+	Fname string
+	Lname string
+	Role  UserRole
+}
+
+func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (GetUserByIdRow, error) {
 	row := q.db.QueryRow(ctx, getUserById, id)
-	var i User
+	var i GetUserByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.Fname,
 		&i.Lname,
-		&i.Password,
 		&i.Role,
-		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -518,7 +523,7 @@ func (q *Queries) ListAllProducts(ctx context.Context) ([]ListAllProductsRow, er
 }
 
 const listAllUsers = `-- name: ListAllUsers :many
-SELECT id, email, fname, lname
+SELECT id, email, fname, lname, role
 FROM users
 ORDER BY fname, lname
 `
@@ -528,6 +533,7 @@ type ListAllUsersRow struct {
 	Email string
 	Fname string
 	Lname string
+	Role  UserRole
 }
 
 func (q *Queries) ListAllUsers(ctx context.Context) ([]ListAllUsersRow, error) {
@@ -544,6 +550,7 @@ func (q *Queries) ListAllUsers(ctx context.Context) ([]ListAllUsersRow, error) {
 			&i.Email,
 			&i.Fname,
 			&i.Lname,
+			&i.Role,
 		); err != nil {
 			return nil, err
 		}
