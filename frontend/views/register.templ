@@ -6,24 +6,25 @@ templ RegisterPage() {
 	@comps.PageWrapper() {
 		@comps.Header("/register")
 		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
-		@comps.Chat()
-		<form
-			id="search-form"
-			class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
-			method="post"
-			action="/register"
-		>
-			@comps.AuthInput("email", "Имейл", "")
-			@comps.AuthInput("fname", "Име", "")
-			@comps.AuthInput("fname", "Фамилия", "")
-			@comps.AuthInput("password", "Парола", "password")
-			<button
-				class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
-				type="submit"
+			@comps.Chat()
+			@comps.AuthHeader()
+			<form
+				id="search-form"
+				class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
+				method="post"
+				action="/register"
 			>
-				Регистрирай се
-			</button>
-		</form>
-	</main>
+				@comps.AuthInput("email", "Имейл", "")
+				@comps.AuthInput("fname", "Име", "")
+				@comps.AuthInput("fname", "Фамилия", "")
+				@comps.AuthInput("password", "Парола", "password")
+				<button
+					class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
+					type="submit"
+				>
+					Регистрирай се
+				</button>
+			</form>
+		</main>
 	}
 }

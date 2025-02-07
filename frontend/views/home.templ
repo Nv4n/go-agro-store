@@ -7,7 +7,6 @@ var homeHandle = templ.NewOnceHandle()
 
 templ ProductsPage(products []sqlcDb.Product) {
 	@comps.PageWrapper() {
-		<body>
 			@comps.Header("/products")
 			@mainComponent(products)
 			@homeHandle.Once() {
@@ -24,7 +23,6 @@ templ ProductsPage(products []sqlcDb.Product) {
 	})();  
 		</script>
 			}
-		</body>
 	}
 }
 
