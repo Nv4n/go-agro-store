@@ -2,31 +2,33 @@ package backend
 
 import (
 	"agro.store/backend/db"
+	"agro.store/backend/pgstore"
 	"agro.store/frontend/views"
+	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
-
-	"agro.store/backend/pgstore"
-
-	"github.com/gin-gonic/gin"
-	// Adjust this import to your local module path for the updated pgstore.
 )
 
 var sessionStore *pgstore.PGStore
 
+var DefaultSessionName = "session-name"
+var dbQueries *db.Queries
+
 // authMiddleware checks for a valid session stored in our PostgreSQL using the modernized pgstore.
 func authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Retrieve the session using the new PGStore Get method.
-		session, err := sessionStore.Get(c.Request, "session-name")
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
 		if err != nil || session.IsNew {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
 		}
-		// Expect that a valid session contains a "userID" value.
+
 		if userID, ok := session.Values["userID"]; ok {
 			c.Set("userID", userID)
 		} else {
@@ -40,9 +42,24 @@ func authMiddleware() gin.HandlerFunc {
 // adminMiddleware is a stub for routes restricted to administrators.
 func adminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Replace with your actual admin check.
-		isAdmin := true
-		if !isAdmin {
+		unparsedUserID, ok := c.Get("userID")
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+		userID, ok := unparsedUserID.(pgtype.UUID)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
+			return
+		}
+
+		u, err := dbQueries.GetUserById(c, userID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
+			return
+		}
+
+		if u.Role != "admin" {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Admins only"})
 			return
 		}
@@ -53,19 +70,49 @@ func adminMiddleware() gin.HandlerFunc {
 // orderOwnerOrAdminMiddleware restricts order routes to the order owner or admins.
 func orderOwnerOrAdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Replace with your actual logic for order ownership.
-		isOwnerOrAdmin := true
-		if !isOwnerOrAdmin {
+
+		unparsedUserID, ok := c.Get("userID")
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+		userID, ok := unparsedUserID.(pgtype.UUID)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
+			return
+		}
+
+		u, err := dbQueries.GetUserById(c, userID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
+			return
+		}
+
+		var orderId pgtype.UUID
+		err = orderId.Scan(c.Param("id"))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
+			return
+		}
+
+		o, err := dbQueries.GetOrderById(c, orderId)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
+			return
+		}
+
+		if u.ID != o.UserID {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Not authorized"})
 			return
 		}
 		c.Next()
 	}
 }
+func init() {
+	_ = godotenv.Load()
+}
 
 func StartServer() {
-	_ = godotenv.Load()
-	// Replace with your PostgreSQL DSN and secret key.
 	dbURL := os.Getenv("DB_URI")
 	var err error
 	sessionStore, err = pgstore.NewPGStore(dbURL, []byte("your-secret-key"))
@@ -73,6 +120,16 @@ func StartServer() {
 		log.Fatalf("failed to initialize pgstore: %v", err)
 	}
 	defer sessionStore.Close()
+
+	ctx := context.Background()
+
+	conn, err := pgx.Connect(ctx, dbURL)
+	if err != nil {
+		log.Fatalf("failed to initialize")
+	}
+	defer conn.Close(ctx)
+
+	dbQueries = db.New(conn)
 
 	// Initialize Gin router and load HTML templates.
 	router := gin.Default()
@@ -97,6 +154,7 @@ func StartServer() {
 	router.GET("/products/create", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "create_product.tmpl", nil)
 	})
+
 	router.POST("/products/create", func(c *gin.Context) {
 		// TODO: Insert logic to create a new product.
 		c.Redirect(http.StatusFound, "/products")
