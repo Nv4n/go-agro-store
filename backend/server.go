@@ -151,7 +151,7 @@ func StartServer() {
 	})
 
 	// GET /products with optional filters: ?tag=...&order=asc|desc|newest
-	router.GET("/products", func(c *gin.Context) {
+	router.GET("/products", authMiddleware(), func(c *gin.Context) {
 		//tag := c.Query("tag")
 		//order := c.Query("order")
 		// TODO: Query your product database applying optional filters.
@@ -184,7 +184,7 @@ func StartServer() {
 	// POST /products/:id/buy saves the current shopping list in the session.
 	router.POST("/products/:id/buy", func(c *gin.Context) {
 		id := c.Param("id")
-		session, err := sessionStore.Get(c.Request, "session-name")
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Session error"})
 			return
@@ -241,12 +241,15 @@ func StartServer() {
 
 	// GET & POST /login.
 	router.GET("/login", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.tmpl", nil)
+		err = views.LoginPage().Render(c.Request.Context(), c.Writer)
+		if err != nil {
+			log.Fatal(err)
+		}
 	})
 	router.POST("/login", func(c *gin.Context) {
 		// For demonstration, assume a "userID" is provided.
 		userID := c.PostForm("userID")
-		session, err := sessionStore.Get(c.Request, "session-name")
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Session error"})
 			return
@@ -261,7 +264,10 @@ func StartServer() {
 
 	// GET & POST /register.
 	router.GET("/register", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "register.tmpl", nil)
+		err = views.RegisterPage().Render(c.Request.Context(), c.Writer)
+		if err != nil {
+			log.Fatal(err)
+		}
 	})
 	router.POST("/register", func(c *gin.Context) {
 		// TODO: Add user registration logic.
