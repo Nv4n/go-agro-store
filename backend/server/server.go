@@ -1,8 +1,9 @@
-package backend
+package server
 
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgtype"
 	"log"
 	"net/http"
 	"os"
@@ -12,111 +13,15 @@ import (
 	"agro.store/frontend/views"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/joho/godotenv"
 )
 
 var sessionStore *pgstore.PGStore
 
 var DefaultSessionName = "session-name"
+var DefaultSecretKey = "your-secret-key"
 var dbQueries *db.Queries
 
-// authMiddleware checks for a valid session stored in our PostgreSQL using the modernized pgstore.
-func authMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session, err := sessionStore.Get(c.Request, DefaultSessionName)
-		if err != nil || session.IsNew {
-			//c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			c.Redirect(http.StatusFound, "/login")
-			c.Abort()
-			return
-		}
-
-		if userID, ok := session.Values["userID"]; ok {
-			c.Set("userID", userID)
-		} else {
-			//c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			c.Redirect(http.StatusFound, "/login")
-			c.Abort()
-			return
-		}
-		c.Next()
-	}
-}
-
-// adminMiddleware is a stub for routes restricted to administrators.
-func adminMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		unparsedUserID, ok := c.Get("userID")
-		if !ok {
-			c.Redirect(http.StatusFound, "/")
-			c.Abort()
-			return
-		}
-		userID, ok := unparsedUserID.(pgtype.UUID)
-		if !ok {
-			c.Redirect(http.StatusFound, "/")
-			c.Abort()
-			return
-		}
-
-		u, err := dbQueries.GetUserById(c, userID)
-		if err != nil {
-			c.Redirect(http.StatusFound, "/")
-			c.Abort()
-			return
-		}
-
-		if u.Role != "admin" {
-			c.Redirect(http.StatusFound, "/")
-			c.Abort()
-			return
-		}
-		c.Next()
-	}
-}
-
-// orderOwnerOrAdminMiddleware restricts order routes to the order owner or admins.
-func orderOwnerOrAdminMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-
-		unparsedUserID, ok := c.Get("userID")
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			return
-		}
-		userID, ok := unparsedUserID.(pgtype.UUID)
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
-			return
-		}
-
-		u, err := dbQueries.GetUserById(c, userID)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
-			return
-		}
-
-		var orderId pgtype.UUID
-		err = orderId.Scan(c.Param("id"))
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
-			return
-		}
-
-		o, err := dbQueries.GetOrderById(c, orderId)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
-			return
-		}
-
-		if u.ID != o.UserID {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Not authorized"})
-			return
-		}
-		c.Next()
-	}
-}
 func init() {
 	_ = godotenv.Load()
 }
@@ -124,7 +29,7 @@ func init() {
 func StartServer() {
 	dbURL := os.Getenv("DB_URI")
 	var err error
-	sessionStore, err = pgstore.NewPGStore(dbURL, []byte("your-secret-key"))
+	sessionStore, err = pgstore.NewPGStore(dbURL, []byte(DefaultSecretKey))
 	if err != nil {
 		log.Fatalf("failed to initialize pgstore: %v", err)
 	}
@@ -140,9 +45,9 @@ func StartServer() {
 
 	dbQueries = db.New(conn)
 
-	// Initialize Gin router and load HTML templates.
 	router := gin.Default()
 	router.Static("/public", "./public")
+
 	// --- Route definitions ---
 
 	// GET "/" redirects to /products.
@@ -161,6 +66,7 @@ func StartServer() {
 
 	// GET & POST /products/create.
 	router.GET("/products/create", func(c *gin.Context) {
+		//TODO implement templ
 		c.HTML(http.StatusOK, "create_product.tmpl", nil)
 	})
 
@@ -171,8 +77,10 @@ func StartServer() {
 
 	// GET & DELETE /products/:id.
 	router.GET("/products/:id", func(c *gin.Context) {
-		id := c.Param("id")
+		unparsedid := c.Param("id")
+		uid, ok := unparsedid.(pgtype.UUID)
 		// TODO: Retrieve product details.
+		dbQueries.GetProductById(c, id)
 		c.HTML(http.StatusOK, "product_detail.tmpl", gin.H{"id": id})
 	})
 	router.DELETE("/products/:id", func(c *gin.Context) {

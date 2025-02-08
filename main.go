@@ -1,7 +1,7 @@
 package main
 
 import (
-	server "agro.store/backend"
+	"agro.store/backend/server"
 	_ "github.com/a-h/templ"
 	_ "github.com/gin-gonic/gin"
 	_ "github.com/gorilla/sessions"
