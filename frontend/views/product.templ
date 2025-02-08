@@ -3,7 +3,7 @@ package views
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
-templ ProductPage(product sqlcDb.Product) {
+templ ProductPage(product sqlcDb.GetProductByIdRow) {
 	@comps.PageWrapper() {
 		@comps.Header("/products/id")
 		<main
@@ -14,7 +14,7 @@ templ ProductPage(product sqlcDb.Product) {
 				class="grid grid-cols-2 grid-flow-row justify-between bg-item1-400 rounded-bl-[2.5rem] p-4"
 			>
 				<div>
-					<span class="font-bold">Семена</span>
+					<span class="font-bold">{ product.Type }</span>
 					<h2 class="text-4xl text-secondary-700">{ product.Name }</h2>
 				</div>
 				<img
@@ -32,7 +32,7 @@ templ ProductPage(product sqlcDb.Product) {
 					<div>
 						<span class="capitalize text-xs font-bold">тип</span>
 						<div class="flex gap-2 font-bold text-2xl">
-							<i class="ti ti-currency-som"></i><span>Домат</span>
+							<i class="ti ti-currency-som"></i><span>{ product.Category }</span>
 						</div>
 					</div>
 				</div>

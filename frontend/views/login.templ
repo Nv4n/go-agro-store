@@ -9,13 +9,12 @@ templ LoginPage() {
 			@comps.Chat()
 			@comps.AuthHeader()
 			<form
-				id="search-form"
 				class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
 				method="post"
 				action="/login"
 			>
-				@comps.AuthInput("email", "Имейл", "")
-				@comps.AuthInput("password", "Парола", "password")
+				@comps.FormInput("email", "Имейл", "")
+				@comps.FormInput("password", "Парола", "password")
 				<button
 					class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
 					type="submit"
