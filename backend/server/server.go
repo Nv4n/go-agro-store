@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgtype"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -77,11 +77,19 @@ func StartServer() {
 
 	// GET & DELETE /products/:id.
 	router.GET("/products/:id", func(c *gin.Context) {
-		unparsedid := c.Param("id")
-		uid, ok := unparsedid.(pgtype.UUID)
+		productId, err := StrToUUID(c.Param("id"))
+		if err != nil {
+			slog.Warn(fmt.Sprintf(""))
+			c.Redirect(http.StatusFound, "/products")
+			c.Abort()
+			return
+		}
 		// TODO: Retrieve product details.
-		dbQueries.GetProductById(c, id)
-		c.HTML(http.StatusOK, "product_detail.tmpl", gin.H{"id": id})
+		product, err := dbQueries.GetProductById(c, productId)
+		if err != nil {
+			return
+		}
+		views.ProductPage(product)
 	})
 	router.DELETE("/products/:id", func(c *gin.Context) {
 		id := c.Param("id")
@@ -90,7 +98,7 @@ func StartServer() {
 	})
 
 	// POST /products/:id/buy saves the current shopping list in the session.
-	router.POST("/products/:id/buy", func(c *gin.Context) {
+	router.POST("/products/:id/buy", authMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
 		session, err := sessionStore.Get(c.Request, DefaultSessionName)
 		if err != nil {
