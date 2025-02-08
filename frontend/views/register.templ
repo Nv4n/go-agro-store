@@ -2,7 +2,7 @@ package views
 
 import comps "agro.store/frontend/views/components"
 
-templ RegisterPage() {
+templ RegisterPage(errMsg string) {
 	@comps.PageWrapper() {
 		@comps.Header("/register")
 		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
@@ -15,7 +15,7 @@ templ RegisterPage() {
 			>
 				@comps.FormInput("email", "Имейл", "")
 				@comps.FormInput("fname", "Име", "")
-				@comps.FormInput("fname", "Фамилия", "")
+				@comps.FormInput("lname", "Фамилия", "")
 				@comps.FormInput("password", "Парола", "password")
 				<button
 					class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
@@ -23,6 +23,9 @@ templ RegisterPage() {
 				>
 					Регистрирай се
 				</button>
+				if errMsg != "" {
+					<span class="text-red-500 font-bold">{ errMsg }</span>
+				}
 			</form>
 		</main>
 	}

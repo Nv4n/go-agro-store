@@ -1,6 +1,5 @@
 package views
 
-import "fmt"
 
 import comps "agro.store/frontend/views/components"
 
@@ -16,26 +15,26 @@ templ CreateProductPage() {
 				method="post"
 				action={ templ.URL(uidLink) }
 			>
-				@comps.FormEditInput("fname", "Име", "", user.Fname)
-				@comps.FormEditInput("lname", "Фамилия", "", user.Lname)
-				if isAdmin {
-					<div class="relative flex flex-col w-fit gap-2">
-						<label class="font-bold" for="role">Роля</label>
-						<select
-							class="border border-secondary-400 p-2 rounded-xl"
-							id="role"
-							name="role"
-						>
-							if user.Role == "user" {
-								<option value="user" selected>User</option>
-								<option value="admin">Admin</option>
-							} else {
-								<option value="user">User</option>
-								<option value="admin" selected>Admin</option>
-							}
-						</select>
-					</div>
-				}
+				// @comps.FormEditInput("fname", "Име", "", user.Fname)
+				// @comps.FormEditInput("lname", "Фамилия", "", user.Lname)
+				// if isAdmin {
+				// 	<div class="relative flex flex-col w-fit gap-2">
+				// 		<label class="font-bold" for="role">Роля</label>
+				// 		<select
+				// 			class="border border-secondary-400 p-2 rounded-xl"
+				// 			id="role"
+				// 			name="role"
+				// 		>
+				// 			if user.Role == "user" {
+				// 				<option value="user" selected>User</option>
+				// 				<option value="admin">Admin</option>
+				// 			} else {
+				// 				<option value="user">User</option>
+				// 				<option value="admin" selected>Admin</option>
+				// 			}
+				// 		</select>
+				// 	</div>
+				// }
 				<button
 					class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
 					type="submit"

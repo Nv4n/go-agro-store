@@ -226,8 +226,8 @@ DO $$
 BEGIN
     CREATE TABLE IF NOT EXISTS http_sessions (
         id BIGSERIAL PRIMARY KEY,
-        key BYTEA,
-        data BYTEA,
+        key TEXT,
+        data TEXT,
         created_on TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
         modified_on TIMESTAMPTZ,
         expires_on TIMESTAMPTZ

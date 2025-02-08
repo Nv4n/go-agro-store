@@ -2,7 +2,7 @@ package views
 
 import comps "agro.store/frontend/views/components"
 
-templ LoginPage() {
+templ LoginPage(errMsg string) {
 	@comps.PageWrapper() {
 		@comps.Header("/login")
 		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
@@ -21,6 +21,9 @@ templ LoginPage() {
 				>
 					Влез в профила
 				</button>
+				if errMsg != "" {
+					<span class="text-red-500 font-bold">{ errMsg }</span>
+				}
 			</form>
 		</main>
 	}

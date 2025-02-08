@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/go-playground/validator/v10"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -47,6 +49,7 @@ func StartServer() {
 
 	router := gin.Default()
 	router.Static("/public", "./public")
+	router.Static("/upload", "./upload")
 
 	// --- Route definitions ---
 
@@ -68,7 +71,9 @@ func StartServer() {
 			return
 		}
 		err = views.ProductsPage(products).Render(c.Request.Context(), c.Writer)
-		log.Fatalf("failed to rended in /products: %v", err)
+		if err != nil {
+			log.Fatalf("failed to render in /products: %v", err)
+		}
 	})
 
 	// GET & POST /products/create.
@@ -80,7 +85,7 @@ func StartServer() {
 		}
 	})
 
-	router.POST("/products/create", func(c *gin.Context) {
+	router.POST("/products/create", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		// TODO: Insert logic to create a new product.
 		c.Redirect(http.StatusFound, "/products")
 	})
@@ -101,7 +106,7 @@ func StartServer() {
 		}
 		views.ProductPage(product)
 	})
-	router.DELETE("/products/:id", func(c *gin.Context) {
+	router.DELETE("/products/:id", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
 		// TODO: Delete the product with the given id.
 		c.JSON(http.StatusOK, gin.H{"status": "deleted", "id": id})
@@ -130,7 +135,7 @@ func StartServer() {
 	})
 
 	// GET & POST /products/:id/edit.
-	router.GET("/products/:id/edit", func(c *gin.Context) {
+	router.GET("/products/:id/edit", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
 		// TODO: Retrieve product for editing.
 		c.HTML(http.StatusOK, "edit_product.tmpl", gin.H{"id": id})
@@ -159,7 +164,7 @@ func StartServer() {
 	})
 
 	// DELETE /user/:id.
-	router.DELETE("/user/:id", authMiddleware(), func(c *gin.Context) {
+	router.DELETE("/user/:id", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
 		// TODO: Delete the user.
 		c.JSON(http.StatusOK, gin.H{"status": "user deleted", "id": id})
@@ -167,7 +172,7 @@ func StartServer() {
 
 	// GET & POST /login.
 	router.GET("/login", func(c *gin.Context) {
-		err = views.LoginPage().Render(c.Request.Context(), c.Writer)
+		err = views.LoginPage("").Render(c.Request.Context(), c.Writer)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -177,27 +182,122 @@ func StartServer() {
 		userID := c.PostForm("userID")
 		session, err := sessionStore.Get(c.Request, DefaultSessionName)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Session error"})
+			slog.Warn(fmt.Sprintf("From POST /login: %v", err))
+
+			err = views.LoginPage("Couldn't login try again").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			c.Abort()
 			return
 		}
 		session.Values["userID"] = userID
 		if err := sessionStore.Save(c.Request, c.Writer, session); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not save session"})
+			slog.Warn(fmt.Sprintf("From POST /login: %v", err))
+			err = views.LoginPage("Couldn't login try again").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			c.Abort()
 			return
 		}
-		c.Redirect(http.StatusFound, "/profile")
+
+		c.Redirect(http.StatusFound, "/")
+		c.Abort()
 	})
 
 	// GET & POST /register.
 	router.GET("/register", func(c *gin.Context) {
-		err = views.RegisterPage().Render(c.Request.Context(), c.Writer)
+		err = views.RegisterPage("").Render(c.Request.Context(), c.Writer)
 		if err != nil {
+			slog.Warn("From GET /register:")
 			log.Fatal(err)
 		}
 	})
+
 	router.POST("/register", func(c *gin.Context) {
-		// TODO: Add user registration logic.
-		c.Redirect(http.StatusFound, "/login")
+		validate := validator.New()
+		var userForm UserRegister
+		err := c.Bind(&userForm)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.RegisterPage("Wrong fields").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		err = validate.Struct(userForm)
+		formErrMsg := ""
+		if err != nil {
+			for _, err := range err.(validator.ValidationErrors) {
+				curr := fmt.Sprintf("Field: %v, Error: %v. ", err.StructField(), err.Tag())
+				formErrMsg += curr
+				slog.Warn(curr)
+			}
+			err = views.RegisterPage(formErrMsg).Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+		_, err = dbQueries.GetUserByEmail(c, userForm.Email)
+		if err == nil {
+			err = views.RegisterPage("Such user already exists").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+
+		hash, err := bcrypt.GenerateFromPassword([]byte(userForm.Password), bcrypt.MinCost)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.RegisterPage("Couldn't register try again").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+		user := db.CreateUserParams{
+			Email:    userForm.Email,
+			Fname:    userForm.FirstName,
+			Lname:    userForm.LastName,
+			Password: string(hash),
+			Role:     "user"}
+
+		createUser, err := dbQueries.CreateUser(c, user)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.RegisterPage("Couldn't register try again").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.RegisterPage("Couldn't register try again").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+
+		session.Values["userID"] = createUser.String()
+		err = sessionStore.Save(c.Request, c.Writer, session)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.RegisterPage("Couldn't register try again").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+		c.Set("userID", createUser.String())
+
+		c.Redirect(http.StatusFound, "/")
 	})
 
 	// Admin-restricted orders routes.
