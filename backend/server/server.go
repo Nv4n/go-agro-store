@@ -56,18 +56,28 @@ func StartServer() {
 	})
 
 	// GET /products with optional filters: ?tag=...&order=asc|desc|newest
-	router.GET("/products", authMiddleware(), func(c *gin.Context) {
+	router.GET("/products", func(c *gin.Context) {
 		//tag := c.Query("tag")
 		//order := c.Query("order")
 		// TODO: Query your product database applying optional filters.
-		var products []db.Product
-		_ = views.ProductsPage(products).Render(c.Request.Context(), c.Writer)
+
+		products, err := dbQueries.ListAllProducts(c)
+		if err != nil {
+			slog.Info("Failed to list all products in /products")
+			slog.Warn(fmt.Sprintf("failed to list all products: %v", err))
+			return
+		}
+		err = views.ProductsPage(products).Render(c.Request.Context(), c.Writer)
+		log.Fatalf("failed to rended in /products: %v", err)
 	})
 
 	// GET & POST /products/create.
-	router.GET("/products/create", func(c *gin.Context) {
+	router.GET("/products/create", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		//TODO implement templ
-		c.HTML(http.StatusOK, "create_product.tmpl", nil)
+		err = views.CreateProductPage().Render(c.Request.Context(), c.Writer)
+		if err != nil {
+			log.Fatalf("failed to render in /products/create: %v", err)
+		}
 	})
 
 	router.POST("/products/create", func(c *gin.Context) {
