@@ -2,7 +2,7 @@ package components
 
 var defaultInputType = "text"
 
-templ AuthInput(inputName string, labelTxt string, inputType string) {
+templ FormInput(inputName string, labelTxt string, inputType string) {
 	{{if inputType == "" {
 	inputType = defaultInputType
 }
@@ -17,3 +17,21 @@ templ AuthInput(inputName string, labelTxt string, inputType string) {
 		/>
 	</div>
 }
+
+templ FormEditInput(inputName string, labelTxt string, inputType string, inputValue string) {
+	{{if inputType == "" {
+	inputType = defaultInputType
+}
+	}}
+	<div class="relative flex flex-col w-fit gap-2">
+		<label class="font-bold" for={ inputName }>{ labelTxt }</label>
+		<input
+			class="border border-secondary-400 p-2 rounded-xl"
+			id={ inputName }
+			name={ inputName }
+			type={ inputType }
+			value={ inputValue }
+		/>
+	</div>
+}
+
