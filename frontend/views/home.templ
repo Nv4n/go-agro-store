@@ -1,16 +1,18 @@
 package views
 
+import "fmt"
+
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
 var homeHandle = templ.NewOnceHandle()
 
-templ ProductsPage(products []sqlcDb.Product) {
+templ ProductsPage(products []sqlcDb.ListAllProductsRow) {
 	@comps.PageWrapper() {
-			@comps.Header("/products")
-			@mainComponent(products)
-			@homeHandle.Once() {
-				<script defer>
+		@comps.Header("/products")
+		@mainComponent(products)
+		@homeHandle.Once() {
+			<script defer>
 	(() => {
 		document
 			.getElementById("search-form")
@@ -22,7 +24,7 @@ templ ProductsPage(products []sqlcDb.Product) {
 			});
 	})();  
 		</script>
-			}
+		}
 	}
 }
 
@@ -44,24 +46,30 @@ templ searchBar() {
 	</form>
 }
 
-templ productComponent(p sqlcDb.Product) {
+templ productComponent(p sqlcDb.ListAllProductsRow) {
+	{{ productLink := fmt.Sprintf("/products/%s", p.ID.String()) }}
+	{{ productBuyLink := fmt.Sprintf("%s/buy", productLink) }}
 	<div class="flex justify-between bg-item1-400 rounded-2xl">
 		<img
 			class="w-28 -mt-6 rounded-t-4xl rounded-bl-2xl"
 			src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-			alt="product"
+			alt="product-image"
 		/>
-		<a href="#" class="flex justify-between flex-col py-3">
+		<a href={ templ.URL(productLink) } class="flex justify-between flex-col py-3">
 			<div>
 				<h2 class="font-bold">{ p.Name }</h2>
-				<span>{ p.Name }</span>
+				if p.Type== "seed" {
+					<span>{ p.Category } family </span>
+				} else {
+					<span>{ p.Category } </span>
+				}
 			</div>
 			<div class="flex gap-2 font-bold text-2xl">
-				<i class="ti ti-currency-som"></i><span>{ p.Price.Int.String() } 5.9</span>
+				<i class="ti ti-currency-som"></i><span>{ p.Price.Int.String() } </span>
 			</div>
 		</a>
 		<a
-			href="/cart"
+			href={ templ.URL(productBuyLink) }
 			class="flex items-center bg-item1-700 rounded-l-[82rem] rounded-r-2xl pl-9 pr-6 py-1 text-white text-4xl cursor-pointer"
 		>
 			<span>+</span>
@@ -69,7 +77,7 @@ templ productComponent(p sqlcDb.Product) {
 	</div>
 }
 
-templ mainComponent(products []sqlcDb.Product) {
+templ mainComponent(products []sqlcDb.ListAllProductsRow) {
 	<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
 		@comps.Chat()
 		<section class="mx-auto">
