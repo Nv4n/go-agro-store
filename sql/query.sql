@@ -179,6 +179,10 @@ FROM products P
 WHERE P.id = $1
 LIMIT 1;
 
+-- name: CreateProduct :exec
+INSERT INTO products (name, price, discount, description, type, category)
+VALUES ($1, $2, 0, $3, $4, $5);
+
 -- name: UpdateProduct :exec
 UPDATE products
 SET name= $2,
@@ -191,3 +195,18 @@ WHERE id = $1;
 DELETE
 FROM products
 WHERE id = $1;
+
+-- name: GetTagByName :one
+SELECT *
+FROM tags
+WHERE name = $1
+LIMIT 1;
+
+-- name: ListAllTags :many
+SELECT *
+FROM tags;
+
+-- name: CreateTag :one
+INSERT INTO tags (name)
+VALUES ($1)
+RETURNING *;

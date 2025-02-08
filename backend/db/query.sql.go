@@ -65,6 +65,48 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) error 
 	return err
 }
 
+const createProduct = `-- name: CreateProduct :exec
+INSERT INTO products (name, price, discount, description, type, category)
+VALUES ($1, $2, 0, $3, $4, $5)
+`
+
+type CreateProductParams struct {
+	Name        string
+	Price       pgtype.Numeric
+	Description pgtype.Text
+	Type        pgtype.UUID
+	Category    pgtype.UUID
+}
+
+func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) error {
+	_, err := q.db.Exec(ctx, createProduct,
+		arg.Name,
+		arg.Price,
+		arg.Description,
+		arg.Type,
+		arg.Category,
+	)
+	return err
+}
+
+const createTag = `-- name: CreateTag :one
+INSERT INTO tags (name)
+VALUES ($1)
+RETURNING id, name, created_at, updated_at
+`
+
+func (q *Queries) CreateTag(ctx context.Context, name string) (Tag, error) {
+	row := q.db.QueryRow(ctx, createTag, name)
+	var i Tag
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (email, fname, lname, password, role)
 VALUES ($1, $2, $3, $4, $5)
@@ -302,6 +344,25 @@ func (q *Queries) GetProductById(ctx context.Context, id pgtype.UUID) (GetProduc
 	return i, err
 }
 
+const getTagByName = `-- name: GetTagByName :one
+SELECT id, name, created_at, updated_at
+FROM tags
+WHERE name = $1
+LIMIT 1
+`
+
+func (q *Queries) GetTagByName(ctx context.Context, name string) (Tag, error) {
+	row := q.db.QueryRow(ctx, getTagByName, name)
+	var i Tag
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT id, email, password
 FROM users
@@ -531,6 +592,36 @@ func (q *Queries) ListAllProducts(ctx context.Context) ([]ListAllProductsRow, er
 			&i.UpdatedAt,
 			&i.Type,
 			&i.Category,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAllTags = `-- name: ListAllTags :many
+SELECT id, name, created_at, updated_at
+FROM tags
+`
+
+func (q *Queries) ListAllTags(ctx context.Context) ([]Tag, error) {
+	rows, err := q.db.Query(ctx, listAllTags)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Tag
+	for rows.Next() {
+		var i Tag
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
