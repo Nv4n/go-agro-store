@@ -206,6 +206,11 @@ LIMIT 1;
 SELECT *
 FROM tags;
 
+-- name: ListAllCategoryTags :many
+SELECT DISTINCT T.id, T.name
+FROM tags T
+         JOIN products P ON T.id = P.category;
+
 -- name: CreateTag :one
 INSERT INTO tags (name)
 VALUES ($1)

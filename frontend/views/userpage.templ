@@ -1,0 +1,38 @@
+package views
+
+import sqlcDb "agro.store/backend/db"
+import comps "agro.store/frontend/views/components"
+
+var homeHandle = templ.NewOnceHandle()
+
+templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.ListAllProductsRow, users []sqlcDb.ListAllUsersRow) {
+	@comps.PageWrapper() {
+		@comps.Header("/profile")
+		@mainComponent(products)
+	}
+}
+
+templ mainComponent(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.ListAllProductsRow, users []sqlcDb.ListAllUsersRow) {
+	<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
+		@comps.Chat()
+		<h2>Добре дошли {  }</h2>
+		if isAdmin {
+			<section class="grid grid-cols-3 text-xl mb-6">
+				<div class="border">
+					<ul>
+						for _,o := range orders {
+							<li class="flex gap-2"></li>
+						}
+					</ul>
+				</div>
+				<div class="border"></div>
+				<div class="border"></div>
+			</section>
+		}
+		<section class="grid grid-cols-1 md:grid-cols-3 gap-11 text-xl">
+			for _, product := range products {
+				@productComponent(product)
+			}
+		</section>
+	</main>
+}

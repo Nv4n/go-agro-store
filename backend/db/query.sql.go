@@ -411,6 +411,37 @@ func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (GetUserByIdR
 	return i, err
 }
 
+const listAllCategoryTags = `-- name: ListAllCategoryTags :many
+SELECT DISTINCT T.id, T.name
+FROM tags T
+         JOIN products P ON T.id = P.category
+`
+
+type ListAllCategoryTagsRow struct {
+	ID   pgtype.UUID
+	Name string
+}
+
+func (q *Queries) ListAllCategoryTags(ctx context.Context) ([]ListAllCategoryTagsRow, error) {
+	rows, err := q.db.Query(ctx, listAllCategoryTags)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListAllCategoryTagsRow
+	for rows.Next() {
+		var i ListAllCategoryTagsRow
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listAllChats = `-- name: ListAllChats :one
 SELECT id, status, created_by, created_at, updated_at
 FROM chats
