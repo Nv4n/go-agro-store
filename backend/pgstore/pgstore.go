@@ -5,6 +5,8 @@ import (
 	"encoding/base32"
 	"errors"
 	"fmt"
+	"log"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -134,6 +136,10 @@ func (store *PGStore) Save(r *http.Request, w http.ResponseWriter, session *sess
 		return err
 	}
 
+	fmt.Println("HERE MF")
+	log.Println("HERE AGAIN")
+	slog.Info(fmt.Sprintf("SAMESITE %v", session.Options.SameSite))
+	slog.Info(fmt.Sprintf("OPTIONS %v", session.Options))
 	http.SetCookie(w, sessions.NewCookie(session.Name(), encoded, session.Options))
 	return nil
 }

@@ -315,6 +315,7 @@ type OrderItem struct {
 
 type Product struct {
 	ID          pgtype.UUID
+	Img         string
 	Name        string
 	Price       pgtype.Numeric
 	Discount    pgtype.Numeric

@@ -159,7 +159,14 @@ func StartServer() {
 	})
 
 	router.GET("/users/:id", authMiddleware(), func(c *gin.Context) {
-		c.Redirect(http.StatusFound, fmt.Sprintf("/"))
+		test := db.GetUserByIdRow{}
+		var products []db.ListAllProductsRow
+		var orders []db.ListAllProductsRow
+		var users []db.ListAllUsersRow
+		err := views.UserPage(test, true, products, orders, users).Render(c.Request.Context(), c.Writer)
+		if err != nil {
+			log.Fatal(err)
+		}
 	})
 
 	// GET & POST /users/:id/edit.
@@ -231,7 +238,7 @@ func StartServer() {
 			return
 		}
 
-		session, err := sessionStore.Get(c.Request, DefaultSessionName)
+		session, err := sessionStore.New(c.Request, DefaultSessionName)
 		if err != nil {
 			slog.Warn(err.Error())
 			err = views.RegisterPage("Couldn't login try again").Render(c.Request.Context(), c.Writer)
