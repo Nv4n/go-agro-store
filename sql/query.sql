@@ -163,6 +163,21 @@ FROM products P
          JOIN tags TYP on TYP.id = P.type
          JOIN tags CAT on CAT.id = P.category;
 
+-- name: ListAllProductsByType :many
+SELECT DISTINCT P.id,
+                P.name,
+                P.price,
+                P.discount,
+                P.description,
+                P.created_at,
+                P.updated_at,
+                TYP.name as type,
+                CAT.name as category
+FROM products P
+         JOIN tags TYP on TYP.id = P.type
+         JOIN tags CAT on CAT.id = P.category
+WHERE TYP.name = $1;
+
 -- name: GetProductById :one
 SELECT DISTINCT P.id,
                 P.name,
@@ -177,6 +192,22 @@ FROM products P
          JOIN tags TYP on TYP.id = P.type
          JOIN tags CAT on CAT.id = P.category
 WHERE P.id = $1
+LIMIT 1;
+
+-- name: GetProductByName :one
+SELECT DISTINCT P.id,
+                P.name,
+                P.price,
+                P.discount,
+                P.description,
+                P.created_at,
+                P.updated_at,
+                TYP.name as type,
+                CAT.name as category
+FROM products P
+         JOIN tags TYP on TYP.id = P.type
+         JOIN tags CAT on CAT.id = P.category
+WHERE P.name = $1
 LIMIT 1;
 
 -- name: CreateProduct :exec
@@ -207,7 +238,7 @@ SELECT *
 FROM tags;
 
 -- name: ListAllCategoryTags :many
-SELECT DISTINCT T.id, T.name
+SELECT DISTINCT P.id, P.name
 FROM tags T
          JOIN products P ON T.id = P.category;
 

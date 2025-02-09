@@ -344,6 +344,52 @@ func (q *Queries) GetProductById(ctx context.Context, id pgtype.UUID) (GetProduc
 	return i, err
 }
 
+const getProductByName = `-- name: GetProductByName :one
+SELECT DISTINCT P.id,
+                P.name,
+                P.price,
+                P.discount,
+                P.description,
+                P.created_at,
+                P.updated_at,
+                TYP.name as type,
+                CAT.name as category
+FROM products P
+         JOIN tags TYP on TYP.id = P.type
+         JOIN tags CAT on CAT.id = P.category
+WHERE P.name = $1
+LIMIT 1
+`
+
+type GetProductByNameRow struct {
+	ID          pgtype.UUID
+	Name        string
+	Price       pgtype.Numeric
+	Discount    pgtype.Numeric
+	Description pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+	Type        string
+	Category    string
+}
+
+func (q *Queries) GetProductByName(ctx context.Context, name string) (GetProductByNameRow, error) {
+	row := q.db.QueryRow(ctx, getProductByName, name)
+	var i GetProductByNameRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Price,
+		&i.Discount,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Type,
+		&i.Category,
+	)
+	return i, err
+}
+
 const getTagByName = `-- name: GetTagByName :one
 SELECT id, name, created_at, updated_at
 FROM tags
@@ -412,7 +458,7 @@ func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (GetUserByIdR
 }
 
 const listAllCategoryTags = `-- name: ListAllCategoryTags :many
-SELECT DISTINCT T.id, T.name
+SELECT DISTINCT P.id, P.name
 FROM tags T
          JOIN products P ON T.id = P.category
 `
@@ -613,6 +659,64 @@ func (q *Queries) ListAllProducts(ctx context.Context) ([]ListAllProductsRow, er
 	var items []ListAllProductsRow
 	for rows.Next() {
 		var i ListAllProductsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			&i.Discount,
+			&i.Description,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Type,
+			&i.Category,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAllProductsByType = `-- name: ListAllProductsByType :many
+SELECT DISTINCT P.id,
+                P.name,
+                P.price,
+                P.discount,
+                P.description,
+                P.created_at,
+                P.updated_at,
+                TYP.name as type,
+                CAT.name as category
+FROM products P
+         JOIN tags TYP on TYP.id = P.type
+         JOIN tags CAT on CAT.id = P.category
+WHERE TYP.name = $1
+`
+
+type ListAllProductsByTypeRow struct {
+	ID          pgtype.UUID
+	Name        string
+	Price       pgtype.Numeric
+	Discount    pgtype.Numeric
+	Description pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+	Type        string
+	Category    string
+}
+
+func (q *Queries) ListAllProductsByType(ctx context.Context, name string) ([]ListAllProductsByTypeRow, error) {
+	rows, err := q.db.Query(ctx, listAllProductsByType, name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListAllProductsByTypeRow
+	for rows.Next() {
+		var i ListAllProductsByTypeRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,

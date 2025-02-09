@@ -1,8 +1,9 @@
 package views
 
+import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
-templ CreateProductPage() {
+templ CreateProductPage(categoryList []sqlcDb.ListAllCategoryTagsRow, errMsg string) {
 	@comps.PageWrapper() {
 		@comps.Header("/products/create")
 		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
@@ -10,11 +11,35 @@ templ CreateProductPage() {
 			<form
 				class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
 				method="post"
-				action={ templ.URL(uidLink) }
+				action="/"
 			>
 				@comps.FormInput("name", "Име на продукта", "")
 				@comps.FormInput("price", "Цена", "")
-				@comps.FormInput("category", "Категория", "")
+				<div class="relative flex flex-col w-fit gap-2">
+					<label class="font-bold" for="description">Описание</label>
+					<textarea
+						class="border border-secondary-400 p-2 rounded-xl"
+						id="description"
+						name="description"
+						rows="4"
+						cols="35"
+					></textarea>
+				</div>
+				<div class="relative flex flex-col w-fit gap-2">
+					<label class="font-bold" for="category">Категория</label>
+					<input
+						class="border border-secondary-400 p-2 rounded-xl"
+						id="category"
+						name="category"
+						type="text"
+						list="category-list"
+					/>
+				</div>
+				<datalist id="category-list">
+					for _, opt := range categoryList {
+						<option value={ opt.Name }></option>
+					}
+				</datalist>
 				<div class="relative flex flex-col w-fit gap-2">
 					<label class="font-bold" for="type">Тип продукт</label>
 					<select
@@ -22,15 +47,20 @@ templ CreateProductPage() {
 						id="type"
 						name="type"
 					>
-						<option></option>
+						<option value="seeds">Семена</option>
+						<option value="equipment">Оборудване</option>
+						<option value="soil">Пръст</option>
 					</select>
 				</div>
 				<button
 					class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
 					type="submit"
 				>
-					Влез в профила
+					Създай Продукт
 				</button>
+				if errMsg != "" {
+					<span class="text-red-500 font-bold">{ errMsg }</span>
+				}
 			</form>
 		</main>
 	}

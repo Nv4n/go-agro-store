@@ -9,6 +9,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"path/filepath"
+	"time"
 
 	"agro.store/backend/db"
 	"agro.store/backend/pgstore"
@@ -56,6 +58,7 @@ func StartServer() {
 	router := gin.Default()
 	router.Static("/public", "./public")
 	router.Static("/upload", "./upload")
+	router.MaxMultipartMemory = 8 << 20
 
 	// --- Route definitions ---
 
@@ -66,16 +69,56 @@ func StartServer() {
 
 	// GET /products with optional filters: ?tag=...&order=asc|desc|newest
 	router.GET("/products", func(c *gin.Context) {
-		//tag := c.Query("tag")
-		//order := c.Query("order")
-		// TODO: Query your product database applying optional filters.
+		productName := c.Query("name")
+		productType := c.Query("type")
+		var products []db.ListAllProductsRow
 
-		products, err := dbQueries.ListAllProducts(c)
-		if err != nil {
-			slog.Info("Failed to list all products in /products")
-			slog.Warn(fmt.Sprintf("failed to list all products: %v", err))
-			return
+		if productName != "" {
+			p, err := dbQueries.GetProductByName(c, productName)
+			if err != nil {
+				slog.Warn(fmt.Sprintf("failed to get product by name: %s", productName))
+				slog.Info(err.Error())
+				c.Redirect(http.StatusFound, "/products")
+				c.Abort()
+				return
+			}
+			products = append(products, db.ListAllProductsRow{ID: p.ID,
+				Name:        p.Name,
+				Price:       p.Price,
+				Discount:    p.Discount,
+				Description: p.Description,
+				CreatedAt:   p.CreatedAt,
+				UpdatedAt:   p.UpdatedAt,
+				Type:        p.Type,
+				Category:    p.Category})
+		} else if productType != "" {
+			prods, err := dbQueries.ListAllProductsByType(c, productName)
+			if err != nil {
+				slog.Warn(fmt.Sprintf("failed to list products by type: %s", productType))
+				c.Redirect(http.StatusFound, "/products")
+				c.Abort()
+				return
+			}
+			for _, p := range prods {
+				products = append(products, db.ListAllProductsRow{ID: p.ID,
+					Name:        p.Name,
+					Price:       p.Price,
+					Discount:    p.Discount,
+					Description: p.Description,
+					CreatedAt:   p.CreatedAt,
+					UpdatedAt:   p.UpdatedAt,
+					Type:        p.Type,
+					Category:    p.Category})
+			}
+		} else {
+			products, err = dbQueries.ListAllProducts(c)
+			if err != nil {
+				slog.Info("Failed to list all products in /products")
+				slog.Warn(fmt.Sprintf("failed to list all products: %v", err))
+				return
+			}
 		}
+
 		err = views.ProductsPage(products).Render(c.Request.Context(), c.Writer)
 		if err != nil {
 			log.Fatalf("failed to render in /products: %v", err)
@@ -84,15 +127,41 @@ func StartServer() {
 
 	// GET & POST /products/create.
 	router.GET("/products/create", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
-		//TODO implement templ
-		err = views.CreateProductPage().Render(c.Request.Context(), c.Writer)
+		var categories []db.ListAllCategoryTagsRow
+		err = views.CreateProductPage(categories, nil).Render(c.Request.Context(), c.Writer)
 		if err != nil {
 			log.Fatalf("failed to render in /products/create: %v", err)
 		}
 	})
 
 	router.POST("/products/create", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
-		// TODO: Insert logic to create a new product.
+		var categories []db.ListAllCategoryTagsRow
+		file, err := c.FormFile("file")
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.CreateProductPage(categories, err.Error()).Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/create: %v", err)
+			}
+			return
+		}
+
+		uploadDir := "/upload"
+
+		ext := filepath.Ext(file.Filename)
+		newFileName := fmt.Sprintf("IMG-%d%s", time.Now().Unix(), ext)
+
+		dst := filepath.Join(uploadDir, newFileName)
+		if err := c.SaveUploadedFile(file, dst); err != nil {
+			slog.Warn(err.Error())
+			err = views.CreateProductPage(categories, "failed to save file").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/create: %v", err)
+			}
+			return
+		}
+
+		log.Println("Uploaded:", newFileName)
 		c.Redirect(http.StatusFound, "/products")
 	})
 
