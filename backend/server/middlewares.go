@@ -7,25 +7,25 @@ import (
 	"net/http"
 )
 
-//func notAuthMiddleware() gin.HandlerFunc {
-//	return func(c *gin.Context) {
-//		session, err := sessionStore.Get(c.Request, DefaultSessionName)
-//		if !session.IsNew {
-//			DefaultMiddlewareLog("From notAuthMiddleware()", "Authorized", c, err)
-//			c.Redirect(http.StatusFound, "/")
-//			c.Abort()
-//			return
-//		}
-//
-//		if _, ok := session.Values["userID"]; ok {
-//			DefaultMiddlewareLog("From notAuthMiddleware()", "Authorized", c, nil)
-//			c.Redirect(http.StatusFound, "/")
-//			c.Abort()
-//			return
-//		}
-//		c.Next()
-//	}
-//}
+func notAuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
+		if err == nil && !session.IsNew {
+			DefaultMiddlewareLog("From notAuthMiddleware()", "Authorized", c, err)
+			c.Redirect(http.StatusFound, "/")
+			c.Abort()
+			return
+		}
+
+		if _, ok := session.Values["userID"]; ok {
+			DefaultMiddlewareLog("From notAuthMiddleware()", "Authorized", c, nil)
+			c.Redirect(http.StatusFound, "/")
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
 
 // authMiddleware checks for a valid session stored in our PostgreSQL using the modernized pgstore.
 func authMiddleware() gin.HandlerFunc {
