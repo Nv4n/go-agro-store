@@ -1,5 +1,7 @@
 package views
 
+import "fmt"
+
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
@@ -13,9 +15,13 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 }
 
 templ mainComponent(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.ListAllProductsRow, users []sqlcDb.ListAllUsersRow) {
+	{{ welcome := fmt.Sprintf("Добре дошли %s %s!", user.Fname, user.Lname) }}
 	<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
 		@comps.Chat()
-		<h2>Добре дошли {  }</h2>
+		<div>
+			<h2>{ welcome }</h2>
+			<a href="/logout"></a>
+		</div>
 		if isAdmin {
 			<section class="grid grid-cols-3 text-xl mb-6">
 				<div class="border">
