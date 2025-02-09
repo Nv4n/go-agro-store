@@ -123,6 +123,7 @@ CREATE TYPE DELIVERY_STATUS AS ENUM ('shipped','in transit','delivered','returne
 CREATE TABLE products
 (
     id          UUID PRIMARY KEY         DEFAULT gen_random_uuid(),
+    img         VARCHAR(255)   NOT NULL,
     name        VARCHAR(255)   NOT NULL,
     price       DECIMAL(10, 2) NOT NULL,
     discount    DECIMAL(5, 2) CHECK (discount >= 0 AND discount <= 100),
