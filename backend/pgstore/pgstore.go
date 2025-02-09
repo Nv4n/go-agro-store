@@ -25,8 +25,8 @@ type PGStore struct {
 // PGSession represents a session record in the database.
 type PGSession struct {
 	ID         int64
-	Key        string
-	Data       string
+	Key        []byte
+	Data       []byte
 	CreatedOn  time.Time
 	ModifiedOn time.Time
 	ExpiresOn  time.Time
@@ -48,8 +48,9 @@ func NewPGStoreFromPool(pool *pgxpool.Pool, keyPairs ...[]byte) (*PGStore, error
 	store := &PGStore{
 		Codecs: securecookie.CodecsFromPairs(keyPairs...),
 		Options: &sessions.Options{
-			Path:   "/",
-			MaxAge: 86400 * 30,
+			Path:     "/",
+			MaxAge:   86400 * 30,
+			HttpOnly: true,
 		},
 		Pool: pool,
 	}
@@ -167,7 +168,7 @@ func (store *PGStore) load(session *sessions.Session) error {
 		return fmt.Errorf("unable to find session: %w", err)
 	}
 
-	return securecookie.DecodeMulti(session.Name(), s.Data, &session.Values, store.Codecs...)
+	return securecookie.DecodeMulti(session.Name(), string(s.Data), &session.Values, store.Codecs...)
 }
 
 // save writes encoded session values to the database.
@@ -197,8 +198,8 @@ func (store *PGStore) save(session *sessions.Session) error {
 	}
 
 	psession := PGSession{
-		Key:        session.ID,
-		Data:       encoded,
+		Key:        []byte(session.ID),
+		Data:       []byte(encoded),
 		CreatedOn:  createdOn,
 		ModifiedOn: time.Now(),
 		ExpiresOn:  expiresOn,
