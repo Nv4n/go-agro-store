@@ -49,7 +49,7 @@ func NewPGStoreFromPool(pool *pgxpool.Pool, keyPairs ...[]byte) (*PGStore, error
 		Codecs: securecookie.CodecsFromPairs(keyPairs...),
 		Options: &sessions.Options{
 			Path:     "/",
-			MaxAge:   86400 * 30,
+			MaxAge:   3600,
 			HttpOnly: true,
 		},
 		Pool: pool,
