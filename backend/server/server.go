@@ -23,6 +23,7 @@ var sessionStore *pgstore.PGStore
 var DefaultSessionName = "session-name"
 var DefaultSecretKey = "your-secret-key"
 var dbQueries *db.Queries
+var validate *validator.Validate
 
 func init() {
 	_ = godotenv.Load()
@@ -46,6 +47,11 @@ func StartServer() {
 	defer conn.Close(ctx)
 
 	dbQueries = db.New(conn)
+
+	validate, err = NewValidator()
+	if err != nil {
+		log.Fatalf("failed to initialize validator: %v", err)
+	}
 
 	router := gin.Default()
 	router.Static("/public", "./public")
@@ -171,43 +177,83 @@ func StartServer() {
 	})
 
 	// GET & POST /login.
-	router.GET("/login", func(c *gin.Context) {
+	router.GET("/login", notAuthMiddleware(), func(c *gin.Context) {
 		err = views.LoginPage("").Render(c.Request.Context(), c.Writer)
 		if err != nil {
 			log.Fatal(err)
 		}
 	})
-	router.POST("/login", func(c *gin.Context) {
-		// For demonstration, assume a "userID" is provided.
-		userID := c.PostForm("userID")
+	router.POST("/login", notAuthMiddleware(), func(c *gin.Context) {
+		var userForm UserLogin
+		err := c.Bind(&userForm)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.LoginPage("Wrong fields").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		err = validate.Struct(userForm)
+		formErrMsg := ""
+		if err != nil {
+			for _, err := range err.(validator.ValidationErrors) {
+				curr := fmt.Sprintf("Field: %v, Error: %v. ", err.StructField(), err.Tag())
+				formErrMsg += curr
+				slog.Warn(curr)
+			}
+			err = views.LoginPage(formErrMsg).Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+		user, err := dbQueries.GetUserByEmail(c, userForm.Email)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.LoginPage("Email or password are wrong").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userForm.Password))
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.LoginPage("Email or password are wrong").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+
 		session, err := sessionStore.Get(c.Request, DefaultSessionName)
 		if err != nil {
-			slog.Warn(fmt.Sprintf("From POST /login: %v", err))
-
-			err = views.LoginPage("Couldn't login try again").Render(c.Request.Context(), c.Writer)
+			slog.Warn(err.Error())
+			err = views.RegisterPage("Couldn't login try again").Render(c.Request.Context(), c.Writer)
 			if err != nil {
 				log.Fatal(err)
 			}
-			c.Abort()
-			return
-		}
-		session.Values["userID"] = userID
-		if err := sessionStore.Save(c.Request, c.Writer, session); err != nil {
-			slog.Warn(fmt.Sprintf("From POST /login: %v", err))
-			err = views.LoginPage("Couldn't login try again").Render(c.Request.Context(), c.Writer)
-			if err != nil {
-				log.Fatal(err)
-			}
-			c.Abort()
 			return
 		}
 
+		session.Values["userID"] = user.ID.String()
+		err = sessionStore.Save(c.Request, c.Writer, session)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.RegisterPage("Couldn't login try again").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+
+		c.Set("userID", user.ID.String())
 		c.Redirect(http.StatusFound, "/")
-		c.Abort()
 	})
 
 	// GET & POST /register.
-	router.GET("/register", func(c *gin.Context) {
+	router.GET("/register", notAuthMiddleware(), func(c *gin.Context) {
 		err = views.RegisterPage("").Render(c.Request.Context(), c.Writer)
 		if err != nil {
 			slog.Warn("From GET /register:")
@@ -215,8 +261,7 @@ func StartServer() {
 		}
 	})
 
-	router.POST("/register", func(c *gin.Context) {
-		validate := validator.New()
+	router.POST("/register", notAuthMiddleware(), func(c *gin.Context) {
 		var userForm UserRegister
 		err := c.Bind(&userForm)
 		if err != nil {
@@ -297,6 +342,21 @@ func StartServer() {
 		}
 		c.Set("userID", createUser.String())
 
+		c.Redirect(http.StatusFound, "/")
+	})
+
+	router.GET("/logout", authMiddleware(), func(c *gin.Context) {
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
+		if err != nil {
+			slog.Warn(err.Error())
+			c.Redirect(http.StatusFound, "/")
+			return
+		}
+		session.Options.MaxAge = -1
+		err = sessionStore.Save(c.Request, c.Writer, session)
+		if err != nil {
+			slog.Warn(err.Error())
+		}
 		c.Redirect(http.StatusFound, "/")
 	})
 

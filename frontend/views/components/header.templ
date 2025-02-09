@@ -3,9 +3,9 @@ package components
 templ navItem(currentPage string, targetPage string) {
 	<li
 		if currentPage == targetPage {
-			class="relative after:content-['|'] text-secondary-700"
+			class="relative after:content-['|'] text-secondary-700 underline hover:text-primary-400"
 		} else {
-			class="relative after:content-['|']"
+			class="relative after:content-['|'] hover:text-primary-400"
 		}
 	>
 		{ children... }
@@ -21,7 +21,7 @@ templ Header(currentPage string) {
 			<h1>AgroStore</h1>
 		</div>
 		<nav>
-			<ul class="flex gap-4 justify-between last:after:content-['']">
+			<ul class="flex gap-4 justify-between">
 				@navItem(currentPage, "/cart") {
 					<a href="/cart"><i class="ti ti-shopping-bag"></i></a>
 				}

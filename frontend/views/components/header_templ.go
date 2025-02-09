@@ -34,12 +34,12 @@ func navItem(currentPage string, targetPage string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if currentPage == targetPage {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " class=\"relative after:content-[&#39;|&#39;] text-secondary-700\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " class=\"relative after:content-[&#39;|&#39;] text-secondary-700 underline hover:text-primary-400\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " class=\"relative after:content-[&#39;|&#39;]\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " class=\"relative after:content-[&#39;|&#39;] hover:text-primary-400\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -81,7 +81,7 @@ func Header(currentPage string) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<header class=\"flex p-4 text-base justify-between sm:text-xl xl:text-3xl\"><div class=\"flex text-primary-400 gap-4\"><i class=\"ti ti-leaf\"></i><h1>AgroStore</h1></div><nav><ul class=\"flex gap-4 justify-between last:after:content-[&#39;&#39;]\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<header class=\"flex p-4 text-base justify-between sm:text-xl xl:text-3xl\"><div class=\"flex text-primary-400 gap-4\"><i class=\"ti ti-leaf\"></i><h1>AgroStore</h1></div><nav><ul class=\"flex gap-4 justify-between\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

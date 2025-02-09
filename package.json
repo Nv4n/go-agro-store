@@ -6,7 +6,7 @@
     "tailwindcss": "^4.0.3"
   },
   "scripts": {
-    "dev": "npx @tailwindcss/cli -i public/input.css -o public/output.css  --optimize --watch",
+    "dev": "npx @tailwindcss/cli -i public/input.css -o public/output.css --watch",
     "tcsshelp": "npx @tailwindcss/cli --help"
   }
 }
