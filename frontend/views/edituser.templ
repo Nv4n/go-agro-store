@@ -14,7 +14,6 @@ templ UserEditPage(user sqlcDb.GetUserByIdRow, isAdmin bool) {
 		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
 			@comps.Chat()
 			<form
-				id="search-form"
 				class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
 				method="post"
 				action={ templ.URL(uidLink) }
@@ -43,7 +42,7 @@ templ UserEditPage(user sqlcDb.GetUserByIdRow, isAdmin bool) {
 					class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
 					type="submit"
 				>
-					Влез в профила
+					Промени профил
 				</button>
 			</form>
 		</main>

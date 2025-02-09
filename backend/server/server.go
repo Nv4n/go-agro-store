@@ -158,19 +158,23 @@ func StartServer() {
 		c.Redirect(http.StatusFound, fmt.Sprintf("/users/%v", userID))
 	})
 
-	// GET & POST /user/:id/edit.
-	router.GET("/user/:id/edit", authMiddleware(), func(c *gin.Context) {
+	router.GET("/users/:id", authMiddleware(), func(c *gin.Context) {
+		c.Redirect(http.StatusFound, fmt.Sprintf("/"))
+	})
+
+	// GET & POST /users/:id/edit.
+	router.GET("/users/:id/edit", authMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
 		c.HTML(http.StatusOK, "edit_user.tmpl", gin.H{"id": id})
 	})
-	router.POST("/user/:id/edit", authMiddleware(), func(c *gin.Context) {
+	router.POST("/users/:id/edit", authMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
 		// TODO: Update user profile.
 		c.Redirect(http.StatusFound, fmt.Sprintf("/users/%v", id))
 	})
 
-	// DELETE /user/:id.
-	router.DELETE("/user/:id", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
+	// DELETE /users/:id.
+	router.DELETE("/users/:id", authMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
 		// TODO: Delete the user.
 		c.JSON(http.StatusOK, gin.H{"status": "user deleted", "id": id})
@@ -238,6 +242,8 @@ func StartServer() {
 		}
 
 		session.Values["userID"] = user.ID.String()
+		log.Println("SID:")
+		log.Println(session.ID)
 		err = sessionStore.Save(c.Request, c.Writer, session)
 		if err != nil {
 			slog.Warn(err.Error())

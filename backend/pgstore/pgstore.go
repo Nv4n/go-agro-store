@@ -51,6 +51,7 @@ func NewPGStoreFromPool(pool *pgxpool.Pool, keyPairs ...[]byte) (*PGStore, error
 			Path:     "/",
 			MaxAge:   3600,
 			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
 		},
 		Pool: pool,
 	}

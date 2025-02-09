@@ -108,20 +108,28 @@ func ProductPage(product sqlcDb.GetProductByIdRow) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span></div></div></div><form action=\"./buy\" method=\"post\"><button type=\"submit\" class=\"bg-primary-400 text-white text-4xl rounded-xl p-2.5 cursor-pointer\"><i class=\"ti ti-shopping-bag-plus\"></i></button></form></section><section><h3 class=\"text-xl font-bold text-secondary-700\">Описание</h3><p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span></div></div></div><form action=\"./buy\" method=\"post\" class=\"bg-primary-400 text-white text-4xl \">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = comps.FormInput("quantity", "Брой", "number").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<button type=\"submit\" class=\"rounded-xl p-2.5 cursor-pointer\"><i class=\"ti ti-shopping-bag-plus\"></i></button></form></section><section><h3 class=\"text-xl font-bold text-secondary-700\">Описание</h3><p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(product.Description.String)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/product.templ`, Line: 51, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/product.templ`, Line: 52, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</p></section></main>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</p></section></main>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

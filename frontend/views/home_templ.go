@@ -147,7 +147,6 @@ func productComponent(p sqlcDb.ListAllProductsRow) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		productLink := fmt.Sprintf("/products/%s", p.ID.String())
-		productBuyLink := fmt.Sprintf("%s/buy", productLink)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex justify-between bg-item1-400 rounded-2xl\"><img class=\"w-28 -mt-6 rounded-t-4xl rounded-bl-2xl\" src=\"https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&amp;w=1904&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\" alt=\"product-image\"> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -164,7 +163,7 @@ func productComponent(p sqlcDb.ListAllProductsRow) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 60, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 59, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -182,7 +181,7 @@ func productComponent(p sqlcDb.ListAllProductsRow) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 62, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 61, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -200,7 +199,7 @@ func productComponent(p sqlcDb.ListAllProductsRow) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(p.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 64, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 63, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -218,22 +217,13 @@ func productComponent(p sqlcDb.ListAllProductsRow) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(p.Price.Int.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 68, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/home.templ`, Line: 67, Col: 66}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span></div></a> <a href=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var11 templ.SafeURL = templ.URL(productBuyLink)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var11)))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"flex items-center bg-item1-700 rounded-l-[82rem] rounded-r-2xl pl-9 pr-6 py-1 text-white text-4xl cursor-pointer\"><span>+</span></a></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span></div></a></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -257,12 +247,12 @@ func mainComponent(products []sqlcDb.ListAllProductsRow) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
+		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var11 == nil {
+			templ_7745c5c3_Var11 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<main class=\"flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<main class=\"flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -270,7 +260,7 @@ func mainComponent(products []sqlcDb.ListAllProductsRow) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<section class=\"mx-auto\"><div class=\"grid p-4 grid-cols-2 lg:grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mb-4 w-fit content-start rounded-xl relative\"><img class=\"relative w-full -top-6 left-0\" src=\"/upload/undraw_gardening.svg\" alt=\"product\"><div><h2 class=\"text-2xl\">Добре дошли</h2><span>Приятно пазаруване</span></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<section class=\"mx-auto\"><div class=\"grid p-4 grid-cols-2 lg:grid-cols-[.5fr_1fr] bg-item3-400 text-secondary-700 mb-4 w-fit content-start rounded-xl relative\"><img class=\"relative w-full -top-6 left-0\" src=\"/upload/undraw_gardening.svg\" alt=\"product\"><div><h2 class=\"text-2xl\">Добре дошли</h2><span>Приятно пазаруване</span></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -278,7 +268,7 @@ func mainComponent(products []sqlcDb.ListAllProductsRow) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</section><section class=\"grid grid-cols-3 text-xl mb-6\"><a href=\"/products?=\" class=\"flex flex-col items-center text-primary-400 font-bold cursor-pointer\"><i class=\"ti ti-seedling text-4xl\"></i> <span class=\"underline\">Семена</span></a> <a class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-shovel-pitchforks text-4xl\"></i> <span>Оборудване</span></a> <a class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-sandbox text-4xl\"></i> <span>Почва</span></a></section><section class=\"grid grid-cols-1 md:grid-cols-3 gap-11 text-xl\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</section><section class=\"grid grid-cols-3 text-xl mb-6\"><a href=\"/products?type=seeds\" class=\"flex flex-col items-center text-primary-400 font-bold cursor-pointer\"><i class=\"ti ti-seedling text-4xl\"></i> <span class=\"underline\">Семена</span></a> <a href=\"/products?type=equipment\" class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-shovel-pitchforks text-4xl\"></i> <span>Оборудване</span></a> <a href=\"/products?type=soil\" class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-sandbox text-4xl\"></i> <span>Почва</span></a></section><section class=\"grid grid-cols-1 md:grid-cols-3 gap-11 text-xl\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -288,7 +278,7 @@ func mainComponent(products []sqlcDb.ListAllProductsRow) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</section></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</section></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

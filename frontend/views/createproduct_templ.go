@@ -55,7 +55,7 @@ func CreateProductPage() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<form id=\"search-form\" class=\"w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl\" method=\"post\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<form class=\"w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl\" method=\"post\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -64,7 +64,23 @@ func CreateProductPage() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><button class=\"cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400\" type=\"submit\">Влез в профила</button></form></main>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = comps.FormInput("name", "Име на продукта", "").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = comps.FormInput("price", "Цена", "").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = comps.FormInput("category", "Категория", "").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"relative flex flex-col w-fit gap-2\"><label class=\"font-bold\" for=\"type\">Тип продукт</label> <select class=\"border border-secondary-400 p-2 rounded-xl\" id=\"type\" name=\"type\"><option></option></select></div><button class=\"cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400\" type=\"submit\">Влез в профила</button></form></main>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

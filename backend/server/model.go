@@ -18,6 +18,14 @@ type UserLogin struct {
 	Password string `json:"password" form:"password" validate:"required,min=8,max=32"`
 }
 
+type ProductCreateEdit struct {
+	Name        string  `json:"name" validate:"required,min=2,max=100"`
+	Price       float64 `json:"price" validate:"required,gt=0"`
+	Description string  `json:"description" validate:"required,max=256"`
+	Type        string  `json:"type" validate:"required,oneof=seeds equipment soil"`
+	Category    string  `json:"category" validate:"required,min=2,max=50"`
+}
+
 var nameRegex = `^[A-ZА-Я][a-zа-я]{1,49}$`
 
 func nameValidator(fl validator.FieldLevel) bool {

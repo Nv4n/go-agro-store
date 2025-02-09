@@ -48,7 +48,6 @@ templ searchBar() {
 
 templ productComponent(p sqlcDb.ListAllProductsRow) {
 	{{ productLink := fmt.Sprintf("/products/%s", p.ID.String()) }}
-	{{ productBuyLink := fmt.Sprintf("%s/buy", productLink) }}
 	<div class="flex justify-between bg-item1-400 rounded-2xl">
 		<img
 			class="w-28 -mt-6 rounded-t-4xl rounded-bl-2xl"
@@ -68,12 +67,12 @@ templ productComponent(p sqlcDb.ListAllProductsRow) {
 				<i class="ti ti-currency-som"></i><span>{ p.Price.Int.String() } </span>
 			</div>
 		</a>
-		<a
-			href={ templ.URL(productBuyLink) }
-			class="flex items-center bg-item1-700 rounded-l-[82rem] rounded-r-2xl pl-9 pr-6 py-1 text-white text-4xl cursor-pointer"
-		>
-			<span>+</span>
-		</a>
+		// <div
+		// 	href={ templ.URL(productBuyLink) }
+		// 	class="flex items-center bg-item1-700 rounded-l-[82rem] rounded-r-2xl pl-9 pr-6 py-1 text-white text-4xl cursor-pointer"
+		// >
+		// 	<span>+</span>
+		// </>
 	</div>
 }
 
@@ -98,17 +97,17 @@ templ mainComponent(products []sqlcDb.ListAllProductsRow) {
 		</section>
 		<section class="grid grid-cols-3 text-xl mb-6">
 			<a
-				href="/products?="
+				href="/products?type=seeds"
 				class="flex flex-col items-center text-primary-400 font-bold cursor-pointer"
 			>
 				<i class="ti ti-seedling text-4xl"></i>
 				<span class="underline">Семена</span>
 			</a>
-			<a class="flex flex-col items-center cursor-pointer">
+			<a href="/products?type=equipment" class="flex flex-col items-center cursor-pointer">
 				<i class="ti ti-shovel-pitchforks text-4xl"></i>
 				<span>Оборудване</span>
 			</a>
-			<a class="flex flex-col items-center cursor-pointer">
+			<a href="/products?type=soil" class="flex flex-col items-center cursor-pointer">
 				<i class="ti ti-sandbox text-4xl"></i>
 				<span>Почва</span>
 			</a>

@@ -1,26 +1,30 @@
 package views
 
-
 import comps "agro.store/frontend/views/components"
 
-templ SomethingPage2() {
+templ ChatPage() {
 	@comps.PageWrapper() {
-		@comps.Header("/login")
+		@comps.Header("/chat/:id")
 		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
-			@comps.Chat()
-			@comps.AuthHeader()
 			<form
 				class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
 				method="post"
-				action="/login"
+				action="./messages"
 			>
-				@comps.FormInput("email", "Имейл", "")
-				@comps.FormInput("password", "Парола", "password")
+				<div class="relative flex flex-col w-fit gap-2">
+					<label class="sr-only" for="message">Съобщение</label>
+					<input
+						class="border border-secondary-400 p-2 rounded-xl"
+						id="message"
+						name="message"
+						type="text"
+					/>
+				</div>
 				<button
 					class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
 					type="submit"
 				>
-					Влез в профила
+					<i class="ti ti-send-2"></i>
 				</button>
 			</form>
 		</main>

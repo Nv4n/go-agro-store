@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import comps "agro.store/frontend/views/components"
 
-func SomethingPage2() templ.Component {
+func ChatPage() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -43,35 +43,11 @@ func SomethingPage2() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = comps.Header("/login").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = comps.Header("/chat/:id").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <main class=\"flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = comps.Chat().Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = comps.AuthHeader().Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<form class=\"w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl\" method=\"post\" action=\"/login\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = comps.FormInput("email", "Имейл", "").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = comps.FormInput("password", "Парола", "password").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<button class=\"cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400\" type=\"submit\">Влез в профила</button></form></main>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <main class=\"flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm\"><form class=\"w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl\" method=\"post\" action=\"./messages\"><div class=\"relative flex flex-col w-fit gap-2\"><label class=\"sr-only\" for=\"message\">Съобщение</label> <input class=\"border border-secondary-400 p-2 rounded-xl\" id=\"message\" name=\"message\" type=\"text\"></div><button class=\"cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400\" type=\"submit\"><i class=\"ti ti-send-2\"></i></button></form></main>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

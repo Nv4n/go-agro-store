@@ -61,7 +61,7 @@ func UserEditPage(user sqlcDb.GetUserByIdRow, isAdmin bool) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<form id=\"search-form\" class=\"w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl\" method=\"post\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<form class=\"w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl\" method=\"post\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -103,7 +103,7 @@ func UserEditPage(user sqlcDb.GetUserByIdRow, isAdmin bool) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button class=\"cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400\" type=\"submit\">Влез в профила</button></form></main>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button class=\"cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400\" type=\"submit\">Промени профил</button></form></main>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

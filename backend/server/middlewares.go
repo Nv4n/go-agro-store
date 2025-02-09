@@ -23,6 +23,7 @@ func notAuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		slog.Info(session.ID)
 		c.Next()
 	}
 }
@@ -120,6 +121,46 @@ func orderOwnerOrAdminMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		c.Next()
+	}
+}
+
+// csrfMiddleware is the middleware function for CSRF protection
+func csrfMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		csrfToken, ok := session.Values[csrfTokenKey].(string)
+		if !ok {
+			csrfToken, err = GenerateCSRFToken()
+			if err != nil {
+				c.AbortWithStatus(http.StatusInternalServerError)
+				return
+			}
+			session.Values[csrfTokenKey] = csrfToken
+			if err := session.Save(c.Request, c.Writer); err != nil {
+				c.AbortWithStatus(http.StatusInternalServerError)
+				return
+			}
+		}
+
+		if c.Request.Method != http.MethodGet {
+			requestToken := c.Request.Header.Get("X-CSRF-Token")
+			if requestToken == "" {
+				requestToken = c.PostForm("csrf_token")
+			}
+			if csrfToken != requestToken {
+				c.AbortWithStatus(http.StatusForbidden)
+				return
+			}
+		}
+
+		// Set the CSRF token in the context for access in handlers
+		c.Set(csrfTokenKey, csrfToken)
 		c.Next()
 	}
 }
