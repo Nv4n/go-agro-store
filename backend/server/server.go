@@ -198,13 +198,66 @@ func StartServer() {
 			}
 			return
 		}
-
-		pgtype.Numeric.Scan()
-		dbProduct := db.CreateProductParams{Name: productForm.Name, Price: productForm.Price}
-		dbQueries.CreateProduct(c)
-
 		log.Println("Uploaded:", dst)
-		c.Redirect(http.StatusFound, "/products")
+
+		priceNumeric := pgtype.Numeric{}
+		err = priceNumeric.Scan(productForm.Price)
+		if err != nil {
+			slog.Warn(err.Error())
+			_ = os.Remove(dst)
+			err = views.CreateProductPage(categories, "Failed to get price").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/create: %v", err)
+			}
+			return
+		}
+		typeTag, err := dbQueries.GetTagByName(c, productForm.Type)
+		if err != nil {
+			typeTag, err = dbQueries.CreateTag(c, productForm.Type)
+			if err != nil {
+				slog.Warn(err.Error())
+				_ = os.Remove(dst)
+				err = views.CreateProductPage(categories, "Failed create type").Render(c.Request.Context(), c.Writer)
+				if err != nil {
+					log.Fatalf("failed to render in /products/create: %v", err)
+				}
+				return
+			}
+		}
+
+		categoryTag, err := dbQueries.GetTagByName(c, productForm.Category)
+		if err != nil {
+			categoryTag, err = dbQueries.CreateTag(c, productForm.Category)
+			if err != nil {
+				slog.Warn(err.Error())
+				_ = os.Remove(dst)
+				err = views.CreateProductPage(categories, "Failed create category").Render(c.Request.Context(), c.Writer)
+				if err != nil {
+					log.Fatalf("failed to render in /products/create: %v", err)
+				}
+				return
+			}
+		}
+
+		dbProduct := db.CreateProductParams{Name: productForm.Name,
+			Price:       priceNumeric,
+			Description: pgtype.Text{String: productForm.Description, Valid: true},
+			Type:        typeTag.ID,
+			Category:    categoryTag.ID,
+			Img:         newFileName,
+		}
+		err = dbQueries.CreateProduct(c, dbProduct)
+		if err != nil {
+			slog.Warn(err.Error())
+			_ = os.Remove(dst)
+			err = views.CreateProductPage(categories, "Failed to create product try again!").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/create: %v", err)
+			}
+			return
+		}
+
+		c.Redirect(http.StatusFound, "/profile")
 	})
 
 	// GET & DELETE /products/:id.

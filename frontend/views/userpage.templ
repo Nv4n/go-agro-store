@@ -5,7 +5,7 @@ import "fmt"
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
-templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.ListAllProductsRow, users []sqlcDb.ListAllUsersRow) {
+templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.Order, users []sqlcDb.ListAllUsersRow) {
 	@comps.PageWrapper() {
 		@comps.Header("/profile")
 		{{ welcome := fmt.Sprintf("Добре дошли %s %s!", user.Fname, user.Lname) }}
@@ -13,19 +13,52 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 			@comps.Chat()
 			<div>
 				<h2>{ welcome }</h2>
-				<a href="/logout"></a>
+				<a href="/logout"><span>Logout</span><i class="ti ti-logout"></i></a>
 			</div>
 			if isAdmin {
 				<section class="grid grid-cols-3 text-xl mb-6">
 					<div class="border">
 						<ul>
 							for _,o := range orders {
-								<li class="flex gap-2">{ o.Name }</li>
+								{{ orderValue := fmt.Sprintf("%s | %s", o.ID, o.Status) }}
+								{{ orderEditUrl := fmt.Sprintf("/orders/%s/edit", o.ID) }}
+								{{ orderDeleteUrl := fmt.Sprintf("/orders/%s/delete", o.ID) }}
+								<li class="flex gap-2">
+									<span>{ orderValue }</span>
+									<a href={ templ.SafeURL(orderEditUrl) }><i class="ti ti-edit"></i></a>
+									<a href={ templ.SafeURL(orderDeleteUrl) }><i class="ti ti-trash"></i></a>
+								</li>
 							}
 						</ul>
 					</div>
-					<div class="border"></div>
-					<div class="border"></div>
+					<div class="border">
+						<ul>
+							for _,p := range products {
+								{{ productValue := fmt.Sprintf("%s | %s", p.Name, p.Price) }}
+								{{ productsEditUrl := fmt.Sprintf("/products/%s/edit", p.ID) }}
+								{{ productDeleteUrl := fmt.Sprintf("/products/%s/delete", p.ID) }}
+								<li class="flex gap-2">
+									<span>{ orderValue }</span>
+									<a href={ templ.SafeURL(productEditUrl) }><i class="ti ti-edit"></i></a>
+									<a href={ templ.SafeURL(productDeleteUrl) }><i class="ti ti-trash"></i></a>
+								</li>
+							}
+						</ul>
+					</div>
+					<div class="border">
+						<ul>
+							for _,u := range users {
+								{{ userValue := fmt.Sprintf("%s | %s %s", u.Email, u.Fname, u.Lname) }}
+								{{ userEditUrl := fmt.Sprintf("/users/%s/edit", o.ID) }}
+								{{ userDeleteUrl := fmt.Sprintf("/users/%s/delete", o.ID) }}
+								<li class="flex gap-2">
+									<span>{ userValue }</span>
+									<a href={ templ.SafeURL(userEditUrl) }><i class="ti ti-edit"></i></a>
+									<a href={ templ.SafeURL(userDeleteUrl) }><i class="ti ti-trash"></i></a>
+								</li>
+							}
+						</ul>
+					</div>
 				</section>
 			}
 			<section class="grid grid-cols-1 md:grid-cols-3 gap-11 text-xl">

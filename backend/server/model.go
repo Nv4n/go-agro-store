@@ -19,11 +19,11 @@ type UserLogin struct {
 }
 
 type ProductCreateEdit struct {
-	Name        string  `json:"name" form:"name" validate:"required,min=2,max=100"`
-	Price       float64 `json:"price" form:"price" validate:"required,gt=0"`
-	Description string  `json:"description" form:"description" validate:"required,max=500"`
-	Type        string  `json:"type" form:"type" validate:"required,oneof=seeds equipment soil"`
-	Category    string  `json:"category" form:"category" validate:"required,min=2,max=50"`
+	Name        string `json:"name" form:"name" validate:"required,min=2,max=100"`
+	Price       string `json:"price" form:"price" validate:"required,numeric,gt=0"`
+	Description string `json:"description" form:"description" validate:"required,max=500"`
+	Type        string `json:"type" form:"type" validate:"required,oneof=seeds equipment soil"`
+	Category    string `json:"category" form:"category" validate:"required,min=2,max=50"`
 }
 
 var nameRegex = `^[A-ZА-Я][a-zа-я]{1,49}$`
