@@ -5,7 +5,7 @@ import "fmt"
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
-templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.Order, users []sqlcDb.ListAllUsersRow,chats []sqlcDb.Chat) {
+templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.Order, users []sqlcDb.ListAllUsersRow, chats []sqlcDb.Chat) {
 	@comps.PageWrapper() {
 		@comps.Header("/profile")
 		{{ welcome := fmt.Sprintf("Добре дошли %s %s!", user.Fname, user.Lname) }}
@@ -17,7 +17,7 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 			</div>
 			if isAdmin {
 				<section class="grid grid-cols-4 text-xl mb-6">
-					<div class="border flex flex-col gap-2">
+					<div class="border flex flex-col gap-4">
 						<h2>Поръчки</h2>
 						<ul>
 							for _,o := range orders {
@@ -32,22 +32,27 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 							}
 						</ul>
 					</div>
-					<div class="border flex flex-col gap-2">
-						<h2>Продукти</h2>
+					<div class="border flex flex-col gap-4">
+						<div class="flex gap-8">
+							<h2>Продукти|</h2>
+							<a href="/products/create">Нов Продукт</a>
+						</div>
 						<ul>
 							for _,p := range products {
 								{{ productValue := fmt.Sprintf("%s | %s", p.Name, p.Price) }}
 								{{ productEditUrl := fmt.Sprintf("/products/%s/edit", p.ID) }}
 								{{ productDeleteUrl := fmt.Sprintf("/products/%s/delete", p.ID) }}
+								{{ imgUrl := fmt.Sprintf("/upload/%s", p.Img) }}
 								<li class="flex gap-2">
 									<span>{ productValue }</span>
+									<img class="w-12 h-12" src={ imgUrl } alt="product-img"/>
 									<a href={ templ.SafeURL(productEditUrl) }><i class="ti ti-edit"></i></a>
 									<a href={ templ.SafeURL(productDeleteUrl) }><i class="ti ti-trash"></i></a>
 								</li>
 							}
 						</ul>
 					</div>
-					<div class="border flex flex-col gap-2">
+					<div class="border flex flex-col gap-4">
 						<h2>Потребители</h2>
 						<ul>
 							for _,u := range users {
@@ -62,7 +67,7 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 							}
 						</ul>
 					</div>
-					<div class="border flex flex-col gap-2">
+					<div class="border flex flex-col gap-4">
 						<h2>Чатове</h2>
 						<ul>
 							for _,c := range chats {
@@ -79,11 +84,6 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 					</div>
 				</section>
 			}
-			<section class="grid grid-cols-1 md:grid-cols-3 gap-11 text-xl">
-				for _, product := range products {
-					@productComponent(product)
-				}
-			</section>
 		</main>
 	}
 }

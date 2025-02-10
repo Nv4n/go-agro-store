@@ -7,10 +7,10 @@ import comps "agro.store/frontend/views/components"
 
 var uidLink string
 
-templ UserEditPage(errMsg string,user sqlcDb.GetUserByIdRow, isAdmin bool) {
-	{{ uidLink = fmt.Sprintf("/user/%s/edit", user.ID.String()) }}
+templ UserEditPage(errMsg string, user sqlcDb.GetUserByIdRow, isAdmin bool) {
+	{{ uidLink = fmt.Sprintf("/users/%s/edit", user.ID.String()) }}
 	@comps.PageWrapper() {
-		@comps.Header("/user/:id/edit")
+		@comps.Header("/users/:id/edit")
 		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
 			@comps.Chat()
 			<form

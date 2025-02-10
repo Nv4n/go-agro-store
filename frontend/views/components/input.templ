@@ -14,6 +14,9 @@ templ FormInput(inputName string, labelTxt string, inputType string) {
 			id={ inputName }
 			name={ inputName }
 			type={ inputType }
+			if inputType == "number" {
+				step="0.01"
+			}
 		/>
 	</div>
 }
@@ -31,6 +34,9 @@ templ FormEditInput(inputName string, labelTxt string, inputType string, inputVa
 			name={ inputName }
 			type={ inputType }
 			value={ inputValue }
+			if inputType == "number" {
+				step="0.01"
+			}
 		/>
 	</div>
 }

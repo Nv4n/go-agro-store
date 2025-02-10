@@ -67,7 +67,9 @@ templ productComponent(p sqlcDb.ListAllProductsRow) {
 				}
 			</div>
 			<div class="flex gap-2 font-bold text-2xl">
-				<i class="ti ti-currency-som"></i><span>{ p.Price.Int.String() } </span>
+			{{ accPrice, _ := p.Price.Float64Value() }}
+			{{ accPriceTxt := fmt.Sprintf("%v", accPrice.Float64) }}
+				<i class="ti ti-currency-som"></i><span>{ accPriceTxt } </span> 
 			</div>
 		</a>
 		// <div

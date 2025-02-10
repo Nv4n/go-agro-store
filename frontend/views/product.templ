@@ -30,13 +30,15 @@ templ ProductPage(product sqlcDb.GetProductByIdRow) {
 					<div>
 						<span class="capitalize text-xs font-bold">цена</span>
 						<div class="flex gap-2 font-bold text-2xl">
-							<i class="ti ti-currency-som"></i><span>{ product.Price.Int.String() }</span>
+							{{ accPrice, _ := product.Price.Float64Value() }}
+							{{ accPriceTxt := fmt.Sprintf("%v", accPrice.Float64) }}
+							<i class="ti ti-currency-som"></i><span>{ accPriceTxt }</span>
 						</div>
 					</div>
 					<div>
 						<span class="capitalize text-xs font-bold">тип</span>
 						<div class="flex gap-2 font-bold text-2xl">
-							<i class="ti ti-currency-som"></i><span>{ product.Category }</span>
+							<span>{ product.Category }</span>
 						</div>
 					</div>
 				</div>

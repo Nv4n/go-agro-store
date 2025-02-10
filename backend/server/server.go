@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"agro.store/backend/db"
@@ -124,6 +125,10 @@ func StartServer() {
 		if err != nil {
 			log.Fatalf("failed to render in /products: %v", err)
 		}
+	})
+
+	router.POST("/products/search", func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/products")
 	})
 
 	// GET & POST /products/create.
@@ -264,6 +269,45 @@ func StartServer() {
 		c.Redirect(http.StatusFound, "/profile")
 	})
 
+	router.GET("/cart", authMiddleware(), func(c *gin.Context) {
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("sessionStore.Get error: %v", err))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/"))
+			return
+		}
+
+		shoppingList, ok := session.Values["shoppingList"].([]struct {
+			ID       string
+			Quantity int
+		})
+		if !ok {
+			shoppingList = []struct {
+				ID       string
+				Quantity int
+			}{}
+		}
+		var products []db.GetProductByIdRow
+		var quants []int
+		for _, shopping := range shoppingList {
+			productId, err := StrToUUID(shopping.ID)
+			if err != nil {
+				continue
+			}
+
+			product, err := dbQueries.GetProductById(c, productId)
+			if err != nil {
+				continue
+			}
+			products = append(products, product)
+			quants = append(quants, shopping.Quantity)
+		}
+		err = views.CartPage(products, quants).Render(c, c.Writer)
+		if err != nil {
+			log.Fatalf("failed to render in /cart: %v", err)
+		}
+	})
+
 	// GET & DELETE /products/:id.
 	router.GET("/products/:id", func(c *gin.Context) {
 		productId, err := StrToUUID(c.Param("id"))
@@ -278,7 +322,10 @@ func StartServer() {
 		if err != nil {
 			return
 		}
-		views.ProductPage(product)
+		err = views.ProductPage(product).Render(c, c.Writer)
+		if err != nil {
+			log.Fatalf("failed to render in /products/view: %v", err)
+		}
 	})
 	router.GET("/products/:id/delete", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
@@ -307,17 +354,31 @@ func StartServer() {
 			return
 		}
 
-		shoppingList, ok := session.Values["shoppingList"].([]string)
+		shoppingList, ok := session.Values["shoppingList"].([]struct {
+			ID       string
+			Quantity int
+		})
 		if !ok {
-			shoppingList = []string{}
+			shoppingList = []struct {
+				ID       string
+				Quantity int
+			}{}
 		}
-		shoppingList = append(shoppingList, id)
+		quantity, err := strconv.Atoi(c.PostForm("quantity"))
+		if quantity < 1 || err != nil {
+			quantity = 1
+		}
+		shoppingList = append(shoppingList, struct {
+			ID       string
+			Quantity int
+		}{ID: id, Quantity: quantity})
 		session.Values["shoppingList"] = shoppingList
 		if err := sessionStore.Save(c.Request, c.Writer, session); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update shopping list"})
+			slog.Warn(err.Error())
+			c.Redirect(http.StatusFound, fmt.Sprintf("/products/%s", id))
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"status": "added", "shoppingList": shoppingList})
+		c.Redirect(http.StatusFound, "/")
 	})
 
 	// GET & POST /products/:id/edit.
@@ -339,7 +400,10 @@ func StartServer() {
 			return
 		}
 
-		views.EditProductPage(product, categories, "")
+		err = views.EditProductPage(product, categories, "").Render(c, c.Writer)
+		if err != nil {
+			log.Fatalf("failed to render in /products/edit: %v", err)
+		}
 	})
 
 	router.POST("/products/:id/edit", func(c *gin.Context) {
@@ -483,6 +547,24 @@ func StartServer() {
 
 	router.GET("/users/:id", authMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Can't get session in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		suid, ok := session.Values["userID"].(string)
+		if !ok {
+			slog.Warn(fmt.Sprintf("Session uid is not string in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		if suid != id {
+			slog.Warn(fmt.Sprintf("Forbidden in /users/:id/"))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+
 		uid, err := StrToUUID(id)
 		if err != nil {
 			slog.Warn(fmt.Sprintf("Id is not UUID in /users/:id : %v", err.Error()))
@@ -519,7 +601,7 @@ func StartServer() {
 			chats = []db.Chat{}
 		}
 
-		err = views.UserPage(user, true, products, orders, users, chats).Render(c.Request.Context(), c.Writer)
+		err = views.UserPage(user, user.Role == "admin", products, orders, users, chats).Render(c.Request.Context(), c.Writer)
 		if err != nil {
 			log.Fatalf("Can't render /users/:id : %v", err)
 		}
@@ -554,7 +636,7 @@ func StartServer() {
 		}
 
 		if id != suid && requestUser.Role != "admin" {
-			slog.Warn(fmt.Sprintf("Forbidden in /users/:id/edit : %v", err.Error()))
+			slog.Warn(fmt.Sprintf("Forbidden in /users/:id/edit"))
 			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
 			return
 		}
@@ -641,16 +723,17 @@ func StartServer() {
 			return
 		}
 		if requestUser.Role == "admin" {
-			roleForm := c.GetString("role")
+			roleForm := c.PostForm("role")
+			log.Println(roleForm, ok)
 			if roleForm != "admin" && roleForm != "user" {
-				slog.Warn(fmt.Sprintf("Can't update role /users/:id/edit : %v", err.Error()))
+				slog.Warn(fmt.Sprintf("Can't update role Non DB /users/:id/edit"))
 				views.UserEditPage("User role is invalid", user, requestUser.Role == "admin")
 				return
 			}
 			if suid != id {
 				_, err = dbQueries.UpdateUserRole(c, db.UpdateUserRoleParams{ID: uid, Role: db.UserRole(roleForm)})
 				if err != nil {
-					slog.Warn(fmt.Sprintf("Can't update role /users/:id/edit : %v", err.Error()))
+					slog.Warn(fmt.Sprintf("Can't update role DB /users/:id/edit : %v", err.Error()))
 					views.UserEditPage("Can't update role try again", user, requestUser.Role == "admin")
 					return
 				}

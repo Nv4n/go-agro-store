@@ -36,7 +36,7 @@ func UserEditPage(errMsg string, user sqlcDb.GetUserByIdRow, isAdmin bool) templ
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		uidLink = fmt.Sprintf("/user/%s/edit", user.ID.String())
+		uidLink = fmt.Sprintf("/users/%s/edit", user.ID.String())
 		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -49,7 +49,7 @@ func UserEditPage(errMsg string, user sqlcDb.GetUserByIdRow, isAdmin bool) templ
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = comps.Header("/user/:id/edit").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = comps.Header("/users/:id/edit").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
