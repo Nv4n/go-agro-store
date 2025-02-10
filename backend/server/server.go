@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	"github.com/jackc/pgx/v5/pgtype"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"log/slog"
@@ -127,7 +128,11 @@ func StartServer() {
 
 	// GET & POST /products/create.
 	router.GET("/products/create", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
-		var categories []db.ListAllCategoryTagsRow
+		categories, err := dbQueries.ListAllCategoryTags(c)
+		if err != nil {
+			slog.Warn(err.Error())
+			categories = []db.ListAllCategoryTagsRow{}
+		}
 		err = views.CreateProductPage(categories, "").Render(c.Request.Context(), c.Writer)
 		if err != nil {
 			log.Fatalf("failed to render in /products/create: %v", err)
@@ -136,7 +141,31 @@ func StartServer() {
 
 	router.POST("/products/create", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		var categories []db.ListAllCategoryTagsRow
-		log.Println("Request Content-Type:", c.Request.Header.Get("Content-Type"))
+		var productForm ProductCreateEdit
+		err := c.ShouldBind(&productForm)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.CreateProductPage(categories, "wrong fields").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/create: %v", err)
+			}
+			return
+		}
+		err = validate.Struct(productForm)
+		formErrMsg := ""
+		if err != nil {
+			for _, err := range err.(validator.ValidationErrors) {
+				curr := fmt.Sprintf("Field: %v, Error: %v. ", err.StructField(), err.Tag())
+				formErrMsg += curr
+				slog.Warn(curr)
+			}
+			err = views.CreateProductPage(categories, formErrMsg).Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/create: %v", err)
+			}
+			return
+		}
+
 		file, err := c.FormFile("file")
 		if err != nil {
 			slog.Warn(err.Error())
@@ -150,10 +179,17 @@ func StartServer() {
 		uploadDir := "./upload"
 
 		ext := filepath.Ext(file.Filename)
-		newFileName := fmt.Sprintf("IMG-%d%s", time.Now().Unix(), ext)
+		if ext != ".svg" && ext != ".jpeg" && ext != ".jpg" && ext != ".png" {
+			err = views.CreateProductPage(categories, "File must be an image").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/create: %v", err)
+			}
+			return
+		}
 
+		newFileName := fmt.Sprintf("IMG-%d%s", time.Now().Unix(), ext)
 		dst := filepath.Join(uploadDir, newFileName)
-		slog.Warn(dst)
+
 		if err := c.SaveUploadedFile(file, dst); err != nil {
 			slog.Warn(err.Error())
 			err = views.CreateProductPage(categories, "failed to save file").Render(c.Request.Context(), c.Writer)
@@ -162,6 +198,10 @@ func StartServer() {
 			}
 			return
 		}
+
+		pgtype.Numeric.Scan()
+		dbProduct := db.CreateProductParams{Name: productForm.Name, Price: productForm.Price}
+		dbQueries.CreateProduct(c)
 
 		log.Println("Uploaded:", dst)
 		c.Redirect(http.StatusFound, "/products")
@@ -267,7 +307,7 @@ func StartServer() {
 	})
 	router.POST("/login", notAuthMiddleware(), func(c *gin.Context) {
 		var userForm UserLogin
-		err := c.Bind(&userForm)
+		err := c.ShouldBind(&userForm)
 		if err != nil {
 			slog.Warn(err.Error())
 			err = views.LoginPage("Wrong fields").Render(c.Request.Context(), c.Writer)
@@ -347,7 +387,7 @@ func StartServer() {
 
 	router.POST("/register", notAuthMiddleware(), func(c *gin.Context) {
 		var userForm UserRegister
-		err := c.Bind(&userForm)
+		err := c.ShouldBind(&userForm)
 		if err != nil {
 			slog.Warn(err.Error())
 			err = views.RegisterPage("Wrong fields").Render(c.Request.Context(), c.Writer)

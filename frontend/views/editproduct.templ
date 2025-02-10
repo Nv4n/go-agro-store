@@ -1,26 +1,87 @@
 package views
 
+import "fmt"
+
+import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
-templ SomethingPage() {
+templ EditProductPage(product sqlcDb.UpdateProductParams, category string, productType string, categoryList []sqlcDb.ListAllCategoryTagsRow, errMsg string) {
 	@comps.PageWrapper() {
-		@comps.Header("/login")
+		{{ formUrl := fmt.Sprintf("/products/%s/edit", product.ID) }}
+		@comps.Header("/products/:id/edit")
 		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
 			@comps.Chat()
-			@comps.AuthHeader()
 			<form
 				class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
 				method="post"
-				action="/login"
+				action={ templ.SafeURL(formUrl) }
+				enctype="multipart/form-data"
 			>
-				@comps.FormInput("email", "Имейл", "")
-				@comps.FormInput("password", "Парола", "password")
+				@comps.FormInputEdit("name", "Име на продукта", "", product.Name)
+				@comps.FormInputEdit("price", "Цена", "number", product.Price)
+				<div class="relative flex flex-col w-fit gap-2">
+					<label class="font-bold" for="description">Снимка</label>
+					<input class="border border-secondary-400 p-2 rounded-xl" type="file" name="file" id="file" accept=".png,.jpg,.jpeg,.svg"/>
+				</div>
+				<div class="relative flex flex-col w-fit gap-2">
+					<label class="font-bold" for="description">Описание</label>
+					<textarea
+						class="border border-secondary-400 p-2 rounded-xl"
+						id="description"
+						name="description"
+						rows="4"
+						cols="35"
+					>{ product.Description.String }</textarea>
+				</div>
+				<div class="relative flex flex-col w-fit gap-2">
+					<label class="font-bold" for="category">Категория</label>
+					<input
+						class="border border-secondary-400 p-2 rounded-xl"
+						id="category"
+						name="category"
+						type="text"
+						list="category-list"
+						value={ category }
+					/>
+				</div>
+				<datalist id="category-list">
+					for _, opt := range categoryList {
+						<option value={ opt.Name }></option>
+					}
+				</datalist>
+				<div class="relative flex flex-col w-fit gap-2">
+					<label class="font-bold" for="type">Тип продукт</label>
+					<select
+						class="border border-secondary-400 p-2 rounded-xl"
+						id="type"
+						name="type"
+					>
+						if productType == "seeds" {
+							<option value="seeds" selected>Семена</option>
+						} else {
+							<option value="seeds">Семена</option>
+						}
+						if productType == "equipment" {
+							<option value="equipment" selected>Оборудване</option>
+						} else {
+							<option value="equipment">Оборудване</option>
+						}
+						if productType == "soil" {
+							<option value="soil" selected>Пръст</option>
+						} else {
+							<option value="soil">Пръст</option>
+						}
+					</select>
+				</div>
 				<button
 					class="cursor-pointer border rounded-xl w-fit p-2.5 hover:text-white hover:bg-primary-400"
 					type="submit"
 				>
-					Влез в профила
+					Промени Продукт
 				</button>
+				if errMsg != "" {
+					<span class="text-red-500 font-bold">{ errMsg }</span>
+				}
 			</form>
 		</main>
 	}

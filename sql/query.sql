@@ -211,15 +211,18 @@ WHERE P.name = $1
 LIMIT 1;
 
 -- name: CreateProduct :exec
-INSERT INTO products (name, price, discount, description, type, category)
-VALUES ($1, $2, 0, $3, $4, $5);
+INSERT INTO products (name, price, discount, description, type, category, img)
+VALUES ($1, $2, 0, $3, $4, $5, $6);
 
 -- name: UpdateProduct :exec
 UPDATE products
 SET name= $2,
     price=$3,
     discount=$4,
-    description=$5
+    description=$5,
+    img=$6,
+    category=$7,
+    type=$8
 WHERE id = $1;
 
 -- name: DeleteProduct :exec

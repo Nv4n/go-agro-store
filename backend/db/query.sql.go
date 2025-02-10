@@ -66,8 +66,8 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) error 
 }
 
 const createProduct = `-- name: CreateProduct :exec
-INSERT INTO products (name, price, discount, description, type, category)
-VALUES ($1, $2, 0, $3, $4, $5)
+INSERT INTO products (name, price, discount, description, type, category, img)
+VALUES ($1, $2, 0, $3, $4, $5, $6)
 `
 
 type CreateProductParams struct {
@@ -76,6 +76,7 @@ type CreateProductParams struct {
 	Description pgtype.Text
 	Type        pgtype.UUID
 	Category    pgtype.UUID
+	Img         string
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) error {
@@ -85,6 +86,7 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) er
 		arg.Description,
 		arg.Type,
 		arg.Category,
+		arg.Img,
 	)
 	return err
 }
@@ -888,7 +890,10 @@ UPDATE products
 SET name= $2,
     price=$3,
     discount=$4,
-    description=$5
+    description=$5,
+    img=$6,
+    category=$7,
+    type=$8
 WHERE id = $1
 `
 
@@ -898,6 +903,9 @@ type UpdateProductParams struct {
 	Price       pgtype.Numeric
 	Discount    pgtype.Numeric
 	Description pgtype.Text
+	Img         string
+	Category    pgtype.UUID
+	Type        pgtype.UUID
 }
 
 func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) error {
@@ -907,6 +915,9 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) er
 		arg.Price,
 		arg.Discount,
 		arg.Description,
+		arg.Img,
+		arg.Category,
+		arg.Type,
 	)
 	return err
 }

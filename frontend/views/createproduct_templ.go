@@ -64,11 +64,11 @@ func CreateProductPage(categoryList []sqlcDb.ListAllCategoryTagsRow, errMsg stri
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = comps.FormInput("price", "Цена", "").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = comps.FormInput("price", "Цена", "number").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"relative flex flex-col w-fit gap-2\"><label class=\"font-bold\" for=\"description\">Снимка</label> <input class=\"border border-secondary-400 p-2 rounded-xl\" type=\"file\" name=\"file\" id=\"file\" required></div><div class=\"relative flex flex-col w-fit gap-2\"><label class=\"font-bold\" for=\"description\">Описание</label> <textarea class=\"border border-secondary-400 p-2 rounded-xl\" id=\"description\" name=\"description\" rows=\"4\" cols=\"35\"></textarea></div><div class=\"relative flex flex-col w-fit gap-2\"><label class=\"font-bold\" for=\"category\">Категория</label> <input class=\"border border-secondary-400 p-2 rounded-xl\" id=\"category\" name=\"category\" type=\"text\" list=\"category-list\"></div><datalist id=\"category-list\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"relative flex flex-col w-fit gap-2\"><label class=\"font-bold\" for=\"description\">Снимка</label> <input class=\"border border-secondary-400 p-2 rounded-xl\" type=\"file\" name=\"file\" id=\"file\" accept=\".png,.jpg,.jpeg,.svg\" required></div><div class=\"relative flex flex-col w-fit gap-2\"><label class=\"font-bold\" for=\"description\">Описание</label> <textarea class=\"border border-secondary-400 p-2 rounded-xl\" id=\"description\" name=\"description\" rows=\"4\" cols=\"35\"></textarea></div><div class=\"relative flex flex-col w-fit gap-2\"><label class=\"font-bold\" for=\"category\">Категория</label> <input class=\"border border-secondary-400 p-2 rounded-xl\" id=\"category\" name=\"category\" type=\"text\" list=\"category-list\"></div><datalist id=\"category-list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
