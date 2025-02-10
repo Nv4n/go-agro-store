@@ -5,7 +5,7 @@ import "fmt"
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
-templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.Order, users []sqlcDb.ListAllUsersRow) {
+templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.Order, users []sqlcDb.ListAllUsersRow,chats []sqlcDb.Chat) {
 	@comps.PageWrapper() {
 		@comps.Header("/profile")
 		{{ welcome := fmt.Sprintf("Добре дошли %s %s!", user.Fname, user.Lname) }}
@@ -16,8 +16,9 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 				<a href="/logout"><span>Logout</span><i class="ti ti-logout"></i></a>
 			</div>
 			if isAdmin {
-				<section class="grid grid-cols-3 text-xl mb-6">
-					<div class="border">
+				<section class="grid grid-cols-4 text-xl mb-6">
+					<div class="border flex flex-col gap-2">
+						<h2>Поръчки</h2>
 						<ul>
 							for _,o := range orders {
 								{{ orderValue := fmt.Sprintf("%s | %s", o.ID, o.Status) }}
@@ -31,7 +32,8 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 							}
 						</ul>
 					</div>
-					<div class="border">
+					<div class="border flex flex-col gap-2">
+						<h2>Продукти</h2>
 						<ul>
 							for _,p := range products {
 								{{ productValue := fmt.Sprintf("%s | %s", p.Name, p.Price) }}
@@ -45,7 +47,8 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 							}
 						</ul>
 					</div>
-					<div class="border">
+					<div class="border flex flex-col gap-2">
+						<h2>Потребители</h2>
 						<ul>
 							for _,u := range users {
 								{{ userValue := fmt.Sprintf("%s | %s %s", u.Email, u.Fname, u.Lname) }}
@@ -55,6 +58,21 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 									<span>{ userValue }</span>
 									<a href={ templ.SafeURL(userEditUrl) }><i class="ti ti-edit"></i></a>
 									<a href={ templ.SafeURL(userDeleteUrl) }><i class="ti ti-trash"></i></a>
+								</li>
+							}
+						</ul>
+					</div>
+					<div class="border flex flex-col gap-2">
+						<h2>Чатове</h2>
+						<ul>
+							for _,c := range chats {
+								{{ chatValue := fmt.Sprintf("%s | %s", c.ID, c.Status) }}
+								{{ chatEditUrl := fmt.Sprintf("/chats/%s/edit", c.ID) }}
+								{{ chatDeleteUrl := fmt.Sprintf("/chats/%s/delete", c.ID) }}
+								<li class="flex gap-2">
+									<span>{ chatValue }</span>
+									<a href={ templ.SafeURL(chatEditUrl) }><i class="ti ti-edit"></i></a>
+									<a href={ templ.SafeURL(chatDeleteUrl) }><i class="ti ti-trash"></i></a>
 								</li>
 							}
 						</ul>

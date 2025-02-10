@@ -13,7 +13,7 @@ import "fmt"
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
-func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.Order, users []sqlcDb.ListAllUsersRow) templ.Component {
+func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAllProductsRow, orders []sqlcDb.Order, users []sqlcDb.ListAllUsersRow, chats []sqlcDb.Chat) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -81,7 +81,7 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 				return templ_7745c5c3_Err
 			}
 			if isAdmin {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<section class=\"grid grid-cols-3 text-xl mb-6\"><div class=\"border\"><ul>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<section class=\"grid grid-cols-4 text-xl mb-6\"><div class=\"border flex flex-col gap-2\"><h2>Поръчки</h2><ul>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -96,7 +96,7 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(orderValue)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/userpage.templ`, Line: 27, Col: 27}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/userpage.templ`, Line: 28, Col: 27}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
@@ -125,7 +125,7 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</ul></div><div class=\"border\"><ul>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</ul></div><div class=\"border flex flex-col gap-2\"><h2>Продукти</h2><ul>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -140,7 +140,7 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(productValue)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/userpage.templ`, Line: 41, Col: 29}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/userpage.templ`, Line: 43, Col: 29}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
@@ -169,7 +169,7 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</ul></div><div class=\"border\"><ul>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</ul></div><div class=\"border flex flex-col gap-2\"><h2>Потребители</h2><ul>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -184,7 +184,7 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 					var templ_7745c5c3_Var10 string
 					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(userValue)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/userpage.templ`, Line: 55, Col: 26}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/userpage.templ`, Line: 58, Col: 26}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 					if templ_7745c5c3_Err != nil {
@@ -213,12 +213,56 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</ul></div></section>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</ul></div><div class=\"border flex flex-col gap-2\"><h2>Чатове</h2><ul>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, c := range chats {
+					chatValue := fmt.Sprintf("%s | %s", c.ID, c.Status)
+					chatEditUrl := fmt.Sprintf("/chats/%s/edit", c.ID)
+					chatDeleteUrl := fmt.Sprintf("/chats/%s/delete", c.ID)
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<li class=\"flex gap-2\"><span>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var13 string
+					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(chatValue)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/userpage.templ`, Line: 73, Col: 26}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span> <a href=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var14 templ.SafeURL = templ.SafeURL(chatEditUrl)
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var14)))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\"><i class=\"ti ti-edit\"></i></a> <a href=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var15 templ.SafeURL = templ.SafeURL(chatDeleteUrl)
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var15)))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\"><i class=\"ti ti-trash\"></i></a></li>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</ul></div></section>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<section class=\"grid grid-cols-1 md:grid-cols-3 gap-11 text-xl\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<section class=\"grid grid-cols-1 md:grid-cols-3 gap-11 text-xl\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -228,7 +272,7 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</section></main>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</section></main>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

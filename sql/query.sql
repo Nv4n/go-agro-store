@@ -47,16 +47,17 @@ WHERE id = $1;
 -- name: GetChatById :one
 SELECT *
 from chats
-WHERE id = $1;
+WHERE id = $1
+LIMIT 1;
 
--- name: GetOpenChatByUserId :one
-SELECT DISTINCT C.id, C.status, C.created_at, C.updated_at
-FROM chats C
-         JOIN messages M ON M.chat_id = C.id
-WHERE C.status = 'open'
-  AND M.user_id = $1;
+-- name: GetChatByCreator :one
+SELECT *
+from chats
+WHERE created_by = $1
+  and status = 'open'
+LIMIT 1;
 
--- name: ListAllChats :one
+-- name: ListAllChats :many
 SELECT *
 FROM chats;
 

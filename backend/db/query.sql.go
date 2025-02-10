@@ -191,14 +191,16 @@ func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
 	return err
 }
 
-const getChatById = `-- name: GetChatById :one
+const getChatByCreator = `-- name: GetChatByCreator :one
 SELECT id, status, created_by, created_at, updated_at
 from chats
-WHERE id = $1
+WHERE created_by = $1
+  and status = 'open'
+LIMIT 1
 `
 
-func (q *Queries) GetChatById(ctx context.Context, id pgtype.UUID) (Chat, error) {
-	row := q.db.QueryRow(ctx, getChatById, id)
+func (q *Queries) GetChatByCreator(ctx context.Context, createdBy pgtype.UUID) (Chat, error) {
+	row := q.db.QueryRow(ctx, getChatByCreator, createdBy)
 	var i Chat
 	err := row.Scan(
 		&i.ID,
@@ -210,27 +212,20 @@ func (q *Queries) GetChatById(ctx context.Context, id pgtype.UUID) (Chat, error)
 	return i, err
 }
 
-const getOpenChatByUserId = `-- name: GetOpenChatByUserId :one
-SELECT DISTINCT C.id, C.status, C.created_at, C.updated_at
-FROM chats C
-         JOIN messages M ON M.chat_id = C.id
-WHERE C.status = 'open'
-  AND M.user_id = $1
+const getChatById = `-- name: GetChatById :one
+SELECT id, status, created_by, created_at, updated_at
+from chats
+WHERE id = $1
+LIMIT 1
 `
 
-type GetOpenChatByUserIdRow struct {
-	ID        pgtype.UUID
-	Status    ChatStatus
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
-}
-
-func (q *Queries) GetOpenChatByUserId(ctx context.Context, userID pgtype.UUID) (GetOpenChatByUserIdRow, error) {
-	row := q.db.QueryRow(ctx, getOpenChatByUserId, userID)
-	var i GetOpenChatByUserIdRow
+func (q *Queries) GetChatById(ctx context.Context, id pgtype.UUID) (Chat, error) {
+	row := q.db.QueryRow(ctx, getChatById, id)
+	var i Chat
 	err := row.Scan(
 		&i.ID,
 		&i.Status,
+		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -515,22 +510,35 @@ func (q *Queries) ListAllCategoryTags(ctx context.Context) ([]ListAllCategoryTag
 	return items, nil
 }
 
-const listAllChats = `-- name: ListAllChats :one
+const listAllChats = `-- name: ListAllChats :many
 SELECT id, status, created_by, created_at, updated_at
 FROM chats
 `
 
-func (q *Queries) ListAllChats(ctx context.Context) (Chat, error) {
-	row := q.db.QueryRow(ctx, listAllChats)
-	var i Chat
-	err := row.Scan(
-		&i.ID,
-		&i.Status,
-		&i.CreatedBy,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
+func (q *Queries) ListAllChats(ctx context.Context) ([]Chat, error) {
+	rows, err := q.db.Query(ctx, listAllChats)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Chat
+	for rows.Next() {
+		var i Chat
+		if err := rows.Scan(
+			&i.ID,
+			&i.Status,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listAllMessagesByChatId = `-- name: ListAllMessagesByChatId :one

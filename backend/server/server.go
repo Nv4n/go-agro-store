@@ -514,7 +514,12 @@ func StartServer() {
 			users = []db.ListAllUsersRow{}
 		}
 
-		err = views.UserPage(user, true, products, orders, users).Render(c.Request.Context(), c.Writer)
+		chats, err := dbQueries.ListAllChats(c)
+		if err != nil {
+			chats = []db.Chat{}
+		}
+
+		err = views.UserPage(user, true, products, orders, users, chats).Render(c.Request.Context(), c.Writer)
 		if err != nil {
 			log.Fatalf("Can't render /users/:id : %v", err)
 		}
