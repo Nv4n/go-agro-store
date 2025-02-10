@@ -459,7 +459,7 @@ func StartServer() {
 			if ext != ".svg" && ext != ".jpeg" && ext != ".jpg" && ext != ".png" {
 				err = views.EditProductPage(product, categories, "File must be an image").Render(c.Request.Context(), c.Writer)
 				if err != nil {
-					log.Fatalf("failed to render in /products/create: %v", err)
+					log.Fatalf("failed to render in /products/edit: %v", err)
 				}
 				return
 			}
@@ -745,7 +745,7 @@ func StartServer() {
 	})
 
 	// DELETE /users/:id.
-	router.DELETE("/users/:id", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
+	router.GET("/users/:id/delete", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
 		uuid, err := StrToUUID(id)
 		if err != nil {
@@ -955,7 +955,7 @@ func StartServer() {
 	router.GET("/orders/:id", authMiddleware(), orderOwnerOrAdminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
 		// TODO: Show order details.
-		c.HTML(http.StatusOK, "order_detail.tmpl", gin.H{"id": id})
+		c.Redirect(http.StatusFound, "/")
 	})
 	router.POST("/orders/:id", authMiddleware(), orderOwnerOrAdminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
@@ -971,8 +971,7 @@ func StartServer() {
 
 	// GET & POST /chats.
 	router.GET("/chats/:id", authMiddleware(), func(c *gin.Context) {
-		// TODO: List all chats.
-		c.HTML(http.StatusOK, "chats.tmpl", nil)
+		c.Redirect(http.StatusFound, "/")
 	})
 
 	// Start the server.
