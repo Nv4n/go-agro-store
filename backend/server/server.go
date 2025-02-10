@@ -566,7 +566,7 @@ func StartServer() {
 			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
 			return
 		}
-		err = views.UserEditPage(user, requestUser.Role == "admin").Render(c, c.Writer)
+		err = views.UserEditPage("", user, requestUser.Role == "admin").Render(c, c.Writer)
 		if err != nil {
 			slog.Warn(fmt.Sprintf("Can't render /users/:id/edit : %v", err.Error()))
 			c.Redirect(http.StatusFound, "/profile")
@@ -623,33 +623,53 @@ func StartServer() {
 		err = c.ShouldBind(&userForm)
 		if err != nil {
 			slog.Warn(fmt.Sprintf("Can't render /users/:id/edit : %v", err.Error()))
-			views.UserEditPage(user, requestUser.Role == "admin")
+			views.UserEditPage("can't get fields", user, requestUser.Role == "admin")
 			return
 		}
 
-		userDbWithNames, err := dbQueries.UpdateUserNames(c, db.UpdateUserNamesParams{ID: uid,
+		_, err = dbQueries.UpdateUserNames(c, db.UpdateUserNamesParams{ID: uid,
 			Fname: userForm.FirstName,
 			Lname: userForm.LastName})
 		if err != nil {
 			slog.Warn(fmt.Sprintf("Can't update user names /users/:id/edit : %v", err.Error()))
-			views.UserEditPage(user, requestUser.Role == "admin")
+			views.UserEditPage("can't update user names try again", user, requestUser.Role == "admin")
 			return
+		}
+		if requestUser.Role == "admin" {
+			roleForm := c.GetString("role")
+			if roleForm != "admin" && roleForm != "user" {
+				slog.Warn(fmt.Sprintf("Can't update role /users/:id/edit : %v", err.Error()))
+				views.UserEditPage("User role is invalid", user, requestUser.Role == "admin")
+				return
+			}
+			if suid != id {
+				_, err = dbQueries.UpdateUserRole(c, db.UpdateUserRoleParams{ID: uid, Role: db.UserRole(roleForm)})
+				if err != nil {
+					slog.Warn(fmt.Sprintf("Can't update role /users/:id/edit : %v", err.Error()))
+					views.UserEditPage("Can't update role try again", user, requestUser.Role == "admin")
+					return
+				}
+			}
 		}
 
-		err = views.UserEditPage(user, user.Role == "admin").Render(c, c.Writer)
-		if err != nil {
-			slog.Warn(fmt.Sprintf("Can't render /users/:id/edit : %v", err.Error()))
-			c.Redirect(http.StatusFound, "/profile")
-			return
-		}
+		c.Redirect(http.StatusFound, "/profile")
+		c.Abort()
 	})
 
 	// DELETE /users/:id.
 	router.DELETE("/users/:id", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
-
-		// TODO: Delete the user.
-		c.JSON(http.StatusOK, gin.H{"status": "user deleted", "id": id})
+		uuid, err := StrToUUID(id)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Id is not UUID in DELETE /users/:id/ : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			c.Abort()
+			return
+		}
+		err = dbQueries.DeleteUser(c, uuid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Error delete user: %v", err.Error()))
+		}
 	})
 
 	// GET & POST /login.
@@ -838,18 +858,10 @@ func StartServer() {
 		c.Redirect(http.StatusFound, "/")
 	})
 
-	// Admin-restricted orders routes.
-	ordersGroup := router.Group("/orders", authMiddleware(), adminMiddleware())
-	{
-		ordersGroup.GET("", func(c *gin.Context) {
-			// TODO: List all orders.
-			c.HTML(http.StatusOK, "orders.tmpl", nil)
-		})
-		ordersGroup.POST("", func(c *gin.Context) {
-			// TODO: Create a new order.
-			c.Redirect(http.StatusFound, "/orders")
-		})
-	}
+	router.POST("/orders/create", authMiddleware(), func(c *gin.Context) {
+		// TODO: Create a new order.
+		c.Redirect(http.StatusFound, "/orders")
+	})
 
 	// GET & POST /orders/:id restricted to order owner and admins.
 	router.GET("/orders/:id", authMiddleware(), orderOwnerOrAdminMiddleware(), func(c *gin.Context) {
@@ -870,25 +882,9 @@ func StartServer() {
 	})
 
 	// GET & POST /chats.
-	router.GET("/chats", authMiddleware(), func(c *gin.Context) {
+	router.GET("/chats/:id", authMiddleware(), func(c *gin.Context) {
 		// TODO: List all chats.
 		c.HTML(http.StatusOK, "chats.tmpl", nil)
-	})
-	router.POST("/chats", authMiddleware(), func(c *gin.Context) {
-		// TODO: Create a new chat.
-		c.Redirect(http.StatusFound, "/chats")
-	})
-
-	// GET & POST /chats/:id/messages.
-	router.GET("/chats/:id/messages", authMiddleware(), func(c *gin.Context) {
-		chatID := c.Param("id")
-		// TODO: Retrieve chat messages.
-		c.HTML(http.StatusOK, "chat_messages.tmpl", gin.H{"chatID": chatID})
-	})
-	router.POST("/chats/:id/messages", authMiddleware(), func(c *gin.Context) {
-		chatID := c.Param("id")
-		// TODO: Post a new message.
-		c.Redirect(http.StatusFound, fmt.Sprintf("/chats/%s/messages", chatID))
 	})
 
 	// Start the server.
