@@ -286,7 +286,7 @@ func mainComponent(products []sqlcDb.ListAllProductsRow) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</section><section class=\"grid grid-cols-3 text-xl mb-6\"><a href=\"/products?type=seeds\" class=\"flex flex-col items-center text-primary-400 font-bold cursor-pointer\"><i class=\"ti ti-seedling text-4xl\"></i> <span class=\"underline\">Семена</span></a> <a href=\"/products?type=equipment\" class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-shovel-pitchforks text-4xl\"></i> <span>Оборудване</span></a> <a href=\"/products?type=soil\" class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-sandbox text-4xl\"></i> <span>Почва</span></a></section><section class=\"grid grid-cols-1 md:grid-cols-3 gap-11 text-xl\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</section><section class=\"grid grid-cols-3 text-xl mb-6\"><a href=\"/products?type=seeds\" class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-seedling text-4xl\"></i> <span>Семена</span></a> <a href=\"/products?type=equipment\" class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-shovel-pitchforks text-4xl\"></i> <span>Оборудване</span></a> <a href=\"/products?type=soil\" class=\"flex flex-col items-center cursor-pointer\"><i class=\"ti ti-sandbox text-4xl\"></i> <span>Почва</span></a></section><section class=\"grid grid-cols-1 md:grid-cols-3 gap-11 text-xl\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

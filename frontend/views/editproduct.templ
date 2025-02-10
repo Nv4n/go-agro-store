@@ -5,7 +5,7 @@ import "fmt"
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
-templ EditProductPage(product sqlcDb.UpdateProductParams, category string, productType string, categoryList []sqlcDb.ListAllCategoryTagsRow, errMsg string) {
+templ EditProductPage(product sqlcDb.GetProductByIdRow, categoryList []sqlcDb.ListAllCategoryTagsRow, errMsg string) {
 	@comps.PageWrapper() {
 		{{ formUrl := fmt.Sprintf("/products/%s/edit", product.ID) }}
 		@comps.Header("/products/:id/edit")
@@ -41,7 +41,7 @@ templ EditProductPage(product sqlcDb.UpdateProductParams, category string, produ
 						name="category"
 						type="text"
 						list="category-list"
-						value={ category }
+						value={ product.Category }
 					/>
 				</div>
 				<datalist id="category-list">
@@ -56,17 +56,17 @@ templ EditProductPage(product sqlcDb.UpdateProductParams, category string, produ
 						id="type"
 						name="type"
 					>
-						if productType == "seeds" {
+						if product.Type == "seeds" {
 							<option value="seeds" selected>Семена</option>
 						} else {
 							<option value="seeds">Семена</option>
 						}
-						if productType == "equipment" {
+						if product.Type == "equipment" {
 							<option value="equipment" selected>Оборудване</option>
 						} else {
 							<option value="equipment">Оборудване</option>
 						}
-						if productType == "soil" {
+						if product.Type == "soil" {
 							<option value="soil" selected>Пръст</option>
 						} else {
 							<option value="soil">Пръст</option>

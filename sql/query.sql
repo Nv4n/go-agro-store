@@ -240,6 +240,12 @@ FROM tags
 WHERE name = $1
 LIMIT 1;
 
+-- name: GetTagById :one
+SELECT *
+FROM tags
+WHERE id = $1
+LIMIT 1;
+
 -- name: ListAllTags :many
 SELECT *
 FROM tags;

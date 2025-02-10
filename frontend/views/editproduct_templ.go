@@ -13,7 +13,7 @@ import "fmt"
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
-func EditProductPage(product sqlcDb.UpdateProductParams, category string, productType string, categoryList []sqlcDb.ListAllCategoryTagsRow, errMsg string) templ.Component {
+func EditProductPage(product sqlcDb.GetProductByIdRow, categoryList []sqlcDb.ListAllCategoryTagsRow, errMsg string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -98,9 +98,9 @@ func EditProductPage(product sqlcDb.UpdateProductParams, category string, produc
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(category)
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(product.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/editproduct.templ`, Line: 44, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/editproduct.templ`, Line: 44, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -133,7 +133,7 @@ func EditProductPage(product sqlcDb.UpdateProductParams, category string, produc
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if productType == "seeds" {
+			if product.Type == "seeds" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<option value=\"seeds\" selected>Семена</option> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -144,7 +144,7 @@ func EditProductPage(product sqlcDb.UpdateProductParams, category string, produc
 					return templ_7745c5c3_Err
 				}
 			}
-			if productType == "equipment" {
+			if product.Type == "equipment" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<option value=\"equipment\" selected>Оборудване</option> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -155,7 +155,7 @@ func EditProductPage(product sqlcDb.UpdateProductParams, category string, produc
 					return templ_7745c5c3_Err
 				}
 			}
-			if productType == "soil" {
+			if product.Type == "soil" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<option value=\"soil\" selected>Пръст</option>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

@@ -398,6 +398,25 @@ func (q *Queries) GetProductByName(ctx context.Context, name string) (GetProduct
 	return i, err
 }
 
+const getTagById = `-- name: GetTagById :one
+SELECT id, name, created_at, updated_at
+FROM tags
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetTagById(ctx context.Context, id pgtype.UUID) (Tag, error) {
+	row := q.db.QueryRow(ctx, getTagById, id)
+	var i Tag
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getTagByName = `-- name: GetTagByName :one
 SELECT id, name, created_at, updated_at
 FROM tags

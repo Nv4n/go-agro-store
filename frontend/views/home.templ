@@ -99,12 +99,14 @@ templ mainComponent(products []sqlcDb.ListAllProductsRow) {
 			@searchBar()
 		</section>
 		<section class="grid grid-cols-3 text-xl mb-6">
+			//  text-primary-400 font-bold 
 			<a
 				href="/products?type=seeds"
-				class="flex flex-col items-center text-primary-400 font-bold cursor-pointer"
+				class="flex flex-col items-center cursor-pointer"
 			>
+				// class="underline"
 				<i class="ti ti-seedling text-4xl"></i>
-				<span class="underline">Семена</span>
+				<span>Семена</span>
 			</a>
 			<a href="/products?type=equipment" class="flex flex-col items-center cursor-pointer">
 				<i class="ti ti-shovel-pitchforks text-4xl"></i>

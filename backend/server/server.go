@@ -140,9 +140,13 @@ func StartServer() {
 	})
 
 	router.POST("/products/create", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
-		var categories []db.ListAllCategoryTagsRow
+		categories, err := dbQueries.ListAllCategoryTags(c)
+		if err != nil {
+			categories = []db.ListAllCategoryTagsRow{}
+		}
+
 		var productForm ProductCreateEdit
-		err := c.ShouldBind(&productForm)
+		err = c.ShouldBind(&productForm)
 		if err != nil {
 			slog.Warn(err.Error())
 			err = views.CreateProductPage(categories, "wrong fields").Render(c.Request.Context(), c.Writer)
@@ -298,10 +302,11 @@ func StartServer() {
 		id := c.Param("id")
 		session, err := sessionStore.Get(c.Request, DefaultSessionName)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Session error"})
+			slog.Warn(fmt.Sprintf("sessionStore.Get error: %v", err))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/products/%s", id))
 			return
 		}
-		// Retrieve or initialize the shopping list.
+
 		shoppingList, ok := session.Values["shoppingList"].([]string)
 		if !ok {
 			shoppingList = []string{}
@@ -318,13 +323,156 @@ func StartServer() {
 	// GET & POST /products/:id/edit.
 	router.GET("/products/:id/edit", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: Retrieve product for editing.
-		c.HTML(http.StatusOK, "edit_product.tmpl", gin.H{"id": id})
+		categories, err := dbQueries.ListAllCategoryTags(c)
+		if err != nil {
+			categories = []db.ListAllCategoryTagsRow{}
+		}
+		pid, err := StrToUUID(id)
+		if err != nil {
+			return
+		}
+		product, err := dbQueries.GetProductById(c, pid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Product not found /products/%s/edit: %v", id, err))
+			c.Redirect(http.StatusFound, "/")
+			c.Abort()
+			return
+		}
+
+		views.EditProductPage(product, categories, "")
 	})
+
 	router.POST("/products/:id/edit", func(c *gin.Context) {
+		var categories []db.ListAllCategoryTagsRow
+		var productForm ProductCreateEdit
 		id := c.Param("id")
-		// TODO: Update product details.
-		c.Redirect(http.StatusFound, fmt.Sprintf("/products/%s", id))
+		pid, err := StrToUUID(id)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Id is not UUID in /products/:id/edit : %v", err))
+			c.Redirect(http.StatusFound, "/profile")
+			c.Abort()
+			return
+		}
+		product, err := dbQueries.GetProductById(c, pid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Such product doesn't exist /products/:id/edit : %v", err))
+			c.Redirect(http.StatusFound, "/profile")
+			c.Abort()
+			return
+		}
+
+		err = c.ShouldBind(&productForm)
+		if err != nil {
+			slog.Warn(err.Error())
+			err = views.EditProductPage(product, categories, "wrong fields").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/:id/create : %v", err)
+			}
+			return
+		}
+		err = validate.Struct(productForm)
+		formErrMsg := ""
+		if err != nil {
+			for _, err := range err.(validator.ValidationErrors) {
+				curr := fmt.Sprintf("Field: %v, Error: %v. ", err.StructField(), err.Tag())
+				formErrMsg += curr
+				slog.Warn(curr)
+			}
+			err = views.EditProductPage(product, categories, formErrMsg).Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/:id/edit : %v", err)
+			}
+			return
+		}
+
+		file, err := c.FormFile("file")
+		var dst string
+		var newFileName string
+		if err == nil {
+			uploadDir := "./upload"
+
+			ext := filepath.Ext(file.Filename)
+			if ext != ".svg" && ext != ".jpeg" && ext != ".jpg" && ext != ".png" {
+				err = views.EditProductPage(product, categories, "File must be an image").Render(c.Request.Context(), c.Writer)
+				if err != nil {
+					log.Fatalf("failed to render in /products/create: %v", err)
+				}
+				return
+			}
+
+			newFileName = fmt.Sprintf("IMG-%d%s", time.Now().Unix(), ext)
+			dst = filepath.Join(uploadDir, newFileName)
+
+			if err := c.SaveUploadedFile(file, dst); err != nil {
+				slog.Warn(err.Error())
+				err = views.EditProductPage(product, categories, "failed to save file").Render(c.Request.Context(), c.Writer)
+				if err != nil {
+					log.Fatalf("failed to render in /products/create: %v", err)
+				}
+				return
+			}
+			log.Println("Uploaded:", dst)
+
+		}
+
+		priceNumeric := pgtype.Numeric{}
+		err = priceNumeric.Scan(productForm.Price)
+		if err != nil {
+			slog.Warn(err.Error())
+			_ = os.Remove(dst)
+			err = views.EditProductPage(product, categories, "Failed to get price").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/create: %v", err)
+			}
+			return
+		}
+		typeTag, err := dbQueries.GetTagByName(c, productForm.Type)
+		if err != nil {
+			typeTag, err = dbQueries.CreateTag(c, productForm.Type)
+			if err != nil {
+				slog.Warn(err.Error())
+				_ = os.Remove(dst)
+				err = views.EditProductPage(product, categories, "Failed create type").Render(c.Request.Context(), c.Writer)
+				if err != nil {
+					log.Fatalf("failed to render in /products/create: %v", err)
+				}
+				return
+			}
+		}
+
+		categoryTag, err := dbQueries.GetTagByName(c, productForm.Category)
+		if err != nil {
+			categoryTag, err = dbQueries.CreateTag(c, productForm.Category)
+			if err != nil {
+				slog.Warn(err.Error())
+				_ = os.Remove(dst)
+				err = views.EditProductPage(product, categories, "Failed create category").Render(c.Request.Context(), c.Writer)
+				if err != nil {
+					log.Fatalf("failed to render in /products/create: %v", err)
+				}
+				return
+			}
+		}
+
+		dbProduct := db.UpdateProductParams{Name: productForm.Name,
+			Price:       priceNumeric,
+			Description: pgtype.Text{String: productForm.Description, Valid: true},
+			Type:        typeTag.ID,
+			Category:    categoryTag.ID,
+			Img:         newFileName,
+		}
+		err = dbQueries.UpdateProduct(c, dbProduct)
+		if err != nil {
+			slog.Warn(err.Error())
+			_ = os.Remove(dst)
+			err = views.EditProductPage(product, categories, "Failed to update product try again!").Render(c.Request.Context(), c.Writer)
+			if err != nil {
+				log.Fatalf("failed to render in /products/create: %v", err)
+			}
+			return
+		}
+
+		c.Redirect(http.StatusFound, "/profile")
 	})
 
 	// GET /profile redirects to /users/:id based on session information.
