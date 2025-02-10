@@ -7,7 +7,7 @@ import comps "agro.store/frontend/views/components"
 
 var uidLink string
 
-templ UserEditPage(user sqlcDb.GetUserByIdRow, isAdmin bool) {
+templ UserEditPage(errMsg string,user sqlcDb.GetUserByIdRow, isAdmin bool) {
 	{{ uidLink = fmt.Sprintf("/user/%s/edit", user.ID.String()) }}
 	@comps.PageWrapper() {
 		@comps.Header("/user/:id/edit")
@@ -44,6 +44,9 @@ templ UserEditPage(user sqlcDb.GetUserByIdRow, isAdmin bool) {
 				>
 					Промени профил
 				</button>
+				if errMsg != "" {
+					<span class="text-red-500 font-bold">{ errMsg }</span>
+				}
 			</form>
 		</main>
 	}

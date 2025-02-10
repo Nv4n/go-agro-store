@@ -63,7 +63,7 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div><h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"text-xl\"><h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -131,16 +131,16 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 				}
 				for _, p := range products {
 					productValue := fmt.Sprintf("%s | %s", p.Name, p.Price)
-					productsEditUrl := fmt.Sprintf("/products/%s/edit", p.ID)
+					productEditUrl := fmt.Sprintf("/products/%s/edit", p.ID)
 					productDeleteUrl := fmt.Sprintf("/products/%s/delete", p.ID)
 					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<li class=\"flex gap-2\"><span>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var7 string
-					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(orderValue)
+					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(productValue)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/userpage.templ`, Line: 41, Col: 27}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/views/userpage.templ`, Line: 41, Col: 29}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
@@ -175,8 +175,8 @@ func UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListAl
 				}
 				for _, u := range users {
 					userValue := fmt.Sprintf("%s | %s %s", u.Email, u.Fname, u.Lname)
-					userEditUrl := fmt.Sprintf("/users/%s/edit", o.ID)
-					userDeleteUrl := fmt.Sprintf("/users/%s/delete", o.ID)
+					userEditUrl := fmt.Sprintf("/users/%s/edit", u.ID)
+					userDeleteUrl := fmt.Sprintf("/users/%s/delete", u.ID)
 					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<li class=\"flex gap-2\"><span>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err

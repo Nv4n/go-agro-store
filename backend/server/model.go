@@ -13,6 +13,11 @@ type UserRegister struct {
 	LastName  string `json:"last_name" form:"lname" validate:"required,name"`
 }
 
+type UserEdit struct {
+	FirstName string `json:"first_name" form:"fname" validate:"required,name"`
+	LastName  string `json:"last_name" form:"lname" validate:"required,name"`
+}
+
 type UserLogin struct {
 	Email    string `json:"email" form:"email" validate:"required,email"`
 	Password string `json:"password" form:"password" validate:"required,min=8,max=32"`

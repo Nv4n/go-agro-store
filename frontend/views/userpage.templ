@@ -11,7 +11,7 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 		{{ welcome := fmt.Sprintf("Добре дошли %s %s!", user.Fname, user.Lname) }}
 		<main class="flex flex-col mx-5 md:mx-24 lg:mx-52 gap-6 text-sm">
 			@comps.Chat()
-			<div>
+			<div class="text-xl">
 				<h2>{ welcome }</h2>
 				<a href="/logout"><span>Logout</span><i class="ti ti-logout"></i></a>
 			</div>
@@ -35,10 +35,10 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 						<ul>
 							for _,p := range products {
 								{{ productValue := fmt.Sprintf("%s | %s", p.Name, p.Price) }}
-								{{ productsEditUrl := fmt.Sprintf("/products/%s/edit", p.ID) }}
+								{{ productEditUrl := fmt.Sprintf("/products/%s/edit", p.ID) }}
 								{{ productDeleteUrl := fmt.Sprintf("/products/%s/delete", p.ID) }}
 								<li class="flex gap-2">
-									<span>{ orderValue }</span>
+									<span>{ productValue }</span>
 									<a href={ templ.SafeURL(productEditUrl) }><i class="ti ti-edit"></i></a>
 									<a href={ templ.SafeURL(productDeleteUrl) }><i class="ti ti-trash"></i></a>
 								</li>
@@ -49,8 +49,8 @@ templ UserPage(user sqlcDb.GetUserByIdRow, isAdmin bool, products []sqlcDb.ListA
 						<ul>
 							for _,u := range users {
 								{{ userValue := fmt.Sprintf("%s | %s %s", u.Email, u.Fname, u.Lname) }}
-								{{ userEditUrl := fmt.Sprintf("/users/%s/edit", o.ID) }}
-								{{ userDeleteUrl := fmt.Sprintf("/users/%s/delete", o.ID) }}
+								{{ userEditUrl := fmt.Sprintf("/users/%s/edit", u.ID) }}
+								{{ userDeleteUrl := fmt.Sprintf("/users/%s/delete", u.ID) }}
 								<li class="flex gap-2">
 									<span>{ userValue }</span>
 									<a href={ templ.SafeURL(userEditUrl) }><i class="ti ti-edit"></i></a>

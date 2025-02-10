@@ -523,17 +523,131 @@ func StartServer() {
 	// GET & POST /users/:id/edit.
 	router.GET("/users/:id/edit", authMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
-		c.HTML(http.StatusOK, "edit_user.tmpl", gin.H{"id": id})
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Can't get session in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		suid, ok := session.Values["userID"].(string)
+		if !ok {
+			slog.Warn(fmt.Sprintf("Session uid is not string in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		requestUid, err := StrToUUID(suid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Session uid is not UUID in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		requestUser, err := dbQueries.GetUserById(c, requestUid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("No such user as requester in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+
+		if id != suid && requestUser.Role != "admin" {
+			slog.Warn(fmt.Sprintf("Forbidden in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		uid, err := StrToUUID(id)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Id is not UUID in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+
+		user, err := dbQueries.GetUserById(c, uid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("No such user in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		err = views.UserEditPage(user, requestUser.Role == "admin").Render(c, c.Writer)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Can't render /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, "/profile")
+			return
+		}
 	})
 	router.POST("/users/:id/edit", authMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: Update user profile.
-		c.Redirect(http.StatusFound, fmt.Sprintf("/users/%v", id))
+		session, err := sessionStore.Get(c.Request, DefaultSessionName)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Can't get session in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		suid, ok := session.Values["userID"].(string)
+		if !ok {
+			slog.Warn(fmt.Sprintf("Session uid is not string in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		requestUid, err := StrToUUID(suid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Session uid is not UUID in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		requestUser, err := dbQueries.GetUserById(c, requestUid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("No such user as requester in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+
+		if id != suid && requestUser.Role != "admin" {
+			slog.Warn(fmt.Sprintf("Forbidden in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+		uid, err := StrToUUID(id)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Id is not UUID in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+
+		user, err := dbQueries.GetUserById(c, uid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("No such user in /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/profile"))
+			return
+		}
+
+		var userForm UserEdit
+		err = c.ShouldBind(&userForm)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Can't render /users/:id/edit : %v", err.Error()))
+			views.UserEditPage(user, requestUser.Role == "admin")
+			return
+		}
+
+		userDbWithNames, err := dbQueries.UpdateUserNames(c, db.UpdateUserNamesParams{ID: uid,
+			Fname: userForm.FirstName,
+			Lname: userForm.LastName})
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Can't update user names /users/:id/edit : %v", err.Error()))
+			views.UserEditPage(user, requestUser.Role == "admin")
+			return
+		}
+
+		err = views.UserEditPage(user, user.Role == "admin").Render(c, c.Writer)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Can't render /users/:id/edit : %v", err.Error()))
+			c.Redirect(http.StatusFound, "/profile")
+			return
+		}
 	})
 
 	// DELETE /users/:id.
-	router.DELETE("/users/:id", authMiddleware(), func(c *gin.Context) {
+	router.DELETE("/users/:id", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
+
 		// TODO: Delete the user.
 		c.JSON(http.StatusOK, gin.H{"status": "user deleted", "id": id})
 	})
