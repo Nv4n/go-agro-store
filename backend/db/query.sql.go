@@ -308,6 +308,7 @@ SELECT DISTINCT P.id,
                 P.description,
                 P.created_at,
                 P.updated_at,
+                P.img,
                 TYP.name as type,
                 CAT.name as category
 FROM products P
@@ -325,6 +326,7 @@ type GetProductByIdRow struct {
 	Description pgtype.Text
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
+	Img         string
 	Type        string
 	Category    string
 }
@@ -340,6 +342,7 @@ func (q *Queries) GetProductById(ctx context.Context, id pgtype.UUID) (GetProduc
 		&i.Description,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Img,
 		&i.Type,
 		&i.Category,
 	)
@@ -354,6 +357,7 @@ SELECT DISTINCT P.id,
                 P.description,
                 P.created_at,
                 P.updated_at,
+                P.img,
                 TYP.name as type,
                 CAT.name as category
 FROM products P
@@ -371,6 +375,7 @@ type GetProductByNameRow struct {
 	Description pgtype.Text
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
+	Img         string
 	Type        string
 	Category    string
 }
@@ -386,6 +391,7 @@ func (q *Queries) GetProductByName(ctx context.Context, name string) (GetProduct
 		&i.Description,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Img,
 		&i.Type,
 		&i.Category,
 	)
@@ -633,6 +639,7 @@ SELECT DISTINCT P.id,
                 P.description,
                 P.created_at,
                 P.updated_at,
+                P.img,
                 TYP.name as type,
                 CAT.name as category
 FROM products P
@@ -648,6 +655,7 @@ type ListAllProductsRow struct {
 	Description pgtype.Text
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
+	Img         string
 	Type        string
 	Category    string
 }
@@ -669,6 +677,7 @@ func (q *Queries) ListAllProducts(ctx context.Context) ([]ListAllProductsRow, er
 			&i.Description,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Img,
 			&i.Type,
 			&i.Category,
 		); err != nil {
@@ -690,6 +699,7 @@ SELECT DISTINCT P.id,
                 P.description,
                 P.created_at,
                 P.updated_at,
+                P.img,
                 TYP.name as type,
                 CAT.name as category
 FROM products P
@@ -706,6 +716,7 @@ type ListAllProductsByTypeRow struct {
 	Description pgtype.Text
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
+	Img         string
 	Type        string
 	Category    string
 }
@@ -727,6 +738,7 @@ func (q *Queries) ListAllProductsByType(ctx context.Context, name string) ([]Lis
 			&i.Description,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Img,
 			&i.Type,
 			&i.Category,
 		); err != nil {

@@ -269,17 +269,28 @@ func StartServer() {
 			c.Abort()
 			return
 		}
-		// TODO: Retrieve product details.
+
 		product, err := dbQueries.GetProductById(c, productId)
 		if err != nil {
 			return
 		}
 		views.ProductPage(product)
 	})
-	router.DELETE("/products/:id", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
+	router.GET("/products/:id/delete", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		id := c.Param("id")
-		// TODO: Delete the product with the given id.
-		c.JSON(http.StatusOK, gin.H{"status": "deleted", "id": id})
+		productId, err := StrToUUID(id)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Id is not UUID in /products/:id/delete : %v", err))
+			c.Redirect(http.StatusFound, "/profile")
+			c.Abort()
+			return
+		}
+		err = dbQueries.DeleteProduct(c, productId)
+		if err != nil {
+			slog.Warn(err.Error())
+		}
+		c.Redirect(http.StatusFound, "/profile")
+		c.Abort()
 	})
 
 	// POST /products/:id/buy saves the current shopping list in the session.
@@ -323,13 +334,41 @@ func StartServer() {
 	})
 
 	router.GET("/users/:id", authMiddleware(), func(c *gin.Context) {
-		test := db.GetUserByIdRow{}
-		var products []db.ListAllProductsRow
-		var orders []db.ListAllProductsRow
-		var users []db.ListAllUsersRow
-		err := views.UserPage(test, true, products, orders, users).Render(c.Request.Context(), c.Writer)
+		id := c.Param("id")
+		uid, err := StrToUUID(id)
 		if err != nil {
-			log.Fatal(err)
+			slog.Warn(fmt.Sprintf("Id is not UUID in /users/:id : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/"))
+			c.Abort()
+			return
+		}
+		user, err := dbQueries.GetUserById(c, uid)
+		if err != nil {
+			slog.Warn(fmt.Sprintf("Error on finding user /users/:id : %v", err.Error()))
+			c.Redirect(http.StatusFound, fmt.Sprintf("/"))
+			c.Abort()
+			return
+		}
+		var products []db.ListAllProductsRow
+		var orders []db.Order
+		var users []db.ListAllUsersRow
+
+		products, err = dbQueries.ListAllProducts(c)
+		if err != nil {
+			products = []db.ListAllProductsRow{}
+		}
+		orders, err = dbQueries.ListAllOrders(c)
+		if err != nil {
+			orders = []db.Order{}
+		}
+		users, err = dbQueries.ListAllUsers(c)
+		if err != nil {
+			users = []db.ListAllUsersRow{}
+		}
+
+		err = views.UserPage(user, true, products, orders, users).Render(c.Request.Context(), c.Writer)
+		if err != nil {
+			log.Fatalf("Can't render /users/:id : %v", err)
 		}
 	})
 

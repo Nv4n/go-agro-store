@@ -1,11 +1,13 @@
 package views
 
+import "fmt"
+
 import sqlcDb "agro.store/backend/db"
 import comps "agro.store/frontend/views/components"
 
 templ ProductPage(product sqlcDb.GetProductByIdRow) {
 	@comps.PageWrapper() {
-		@comps.Header("/products/id")
+		@comps.Header("/products/:id")
 		<main
 			class="flex flex-col relative mx-5 md:mx-24 lg:mx-52 gap-6 text-sm"
 		>
@@ -17,10 +19,11 @@ templ ProductPage(product sqlcDb.GetProductByIdRow) {
 					<span class="font-bold">{ product.Type }</span>
 					<h2 class="text-4xl text-secondary-700">{ product.Name }</h2>
 				</div>
+				{{ imgUrl := fmt.Sprintf("/upload/%s", product.Img) }}
 				<img
 					loading="lazy"
 					class="w-56 object-cover justify-self-end row-span-3 col-start-2 -m-4"
-					src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+					src={ imgUrl }
 					alt="product-image"
 				/>
 				<div>
@@ -37,7 +40,8 @@ templ ProductPage(product sqlcDb.GetProductByIdRow) {
 						</div>
 					</div>
 				</div>
-				<form action="./buy" method="post" class="bg-primary-400 text-white text-4xl ">
+				{{ productBuyUrl := fmt.Sprintf("/products/%s/buy", product.ID.String()) }}
+				<form action={ templ.SafeURL(productBuyUrl) } method="post" class="bg-primary-400 text-white text-4xl ">
 					@comps.FormInput("quantity", "Брой", "number")
 					<button
 						type="submit"

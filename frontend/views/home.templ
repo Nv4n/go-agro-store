@@ -38,8 +38,10 @@ templ searchBar() {
 		<button class="text-xl cursor-pointer" type="submit">
 			<i class="ti ti-search"></i>
 		</button>
+		<label class="sr-only" for="productname">Име на продукт</label>
 		<input
-			id="search-input"
+			id="productname"
+			name="productname"
 			class="w-full text-lg focus:border-none focus:outline-none"
 			type="text"
 		/>
@@ -49,9 +51,10 @@ templ searchBar() {
 templ productComponent(p sqlcDb.ListAllProductsRow) {
 	{{ productLink := fmt.Sprintf("/products/%s", p.ID.String()) }}
 	<div class="flex justify-between bg-item1-400 rounded-2xl">
+		{{ imgUrl := fmt.Sprintf("/upload/%s", p.Img) }}
 		<img
 			class="w-28 -mt-6 rounded-t-4xl rounded-bl-2xl"
-			src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+			src={ imgUrl }
 			alt="product-image"
 		/>
 		<a href={ templ.URL(productLink) } class="flex justify-between flex-col py-3">

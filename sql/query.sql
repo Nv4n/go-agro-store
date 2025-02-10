@@ -157,6 +157,7 @@ SELECT DISTINCT P.id,
                 P.description,
                 P.created_at,
                 P.updated_at,
+                P.img,
                 TYP.name as type,
                 CAT.name as category
 FROM products P
@@ -171,6 +172,7 @@ SELECT DISTINCT P.id,
                 P.description,
                 P.created_at,
                 P.updated_at,
+                P.img,
                 TYP.name as type,
                 CAT.name as category
 FROM products P
@@ -186,6 +188,7 @@ SELECT DISTINCT P.id,
                 P.description,
                 P.created_at,
                 P.updated_at,
+                P.img,
                 TYP.name as type,
                 CAT.name as category
 FROM products P
@@ -202,6 +205,7 @@ SELECT DISTINCT P.id,
                 P.description,
                 P.created_at,
                 P.updated_at,
+                P.img,
                 TYP.name as type,
                 CAT.name as category
 FROM products P
