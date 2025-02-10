@@ -128,7 +128,7 @@ func StartServer() {
 	// GET & POST /products/create.
 	router.GET("/products/create", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		var categories []db.ListAllCategoryTagsRow
-		err = views.CreateProductPage(categories, nil).Render(c.Request.Context(), c.Writer)
+		err = views.CreateProductPage(categories, "").Render(c.Request.Context(), c.Writer)
 		if err != nil {
 			log.Fatalf("failed to render in /products/create: %v", err)
 		}
@@ -136,6 +136,7 @@ func StartServer() {
 
 	router.POST("/products/create", authMiddleware(), adminMiddleware(), func(c *gin.Context) {
 		var categories []db.ListAllCategoryTagsRow
+		log.Println("Request Content-Type:", c.Request.Header.Get("Content-Type"))
 		file, err := c.FormFile("file")
 		if err != nil {
 			slog.Warn(err.Error())
@@ -146,12 +147,13 @@ func StartServer() {
 			return
 		}
 
-		uploadDir := "/upload"
+		uploadDir := "./upload"
 
 		ext := filepath.Ext(file.Filename)
 		newFileName := fmt.Sprintf("IMG-%d%s", time.Now().Unix(), ext)
 
 		dst := filepath.Join(uploadDir, newFileName)
+		slog.Warn(dst)
 		if err := c.SaveUploadedFile(file, dst); err != nil {
 			slog.Warn(err.Error())
 			err = views.CreateProductPage(categories, "failed to save file").Render(c.Request.Context(), c.Writer)
@@ -161,7 +163,7 @@ func StartServer() {
 			return
 		}
 
-		log.Println("Uploaded:", newFileName)
+		log.Println("Uploaded:", dst)
 		c.Redirect(http.StatusFound, "/products")
 	})
 

@@ -11,10 +11,15 @@ templ CreateProductPage(categoryList []sqlcDb.ListAllCategoryTagsRow, errMsg str
 			<form
 				class="w-full flex justify-start flex-col gap-4.5 p-4.5 bg-item1-700 text-secondary-700 rounded-xl text-xl"
 				method="post"
-				action="/"
+				action="/products/create"
+				enctype="multipart/form-data"
 			>
 				@comps.FormInput("name", "Име на продукта", "")
 				@comps.FormInput("price", "Цена", "")
+				<div class="relative flex flex-col w-fit gap-2">
+					<label class="font-bold" for="description">Снимка</label>
+					<input class="border border-secondary-400 p-2 rounded-xl" type="file" name="file" id="file" required/>
+				</div>
 				<div class="relative flex flex-col w-fit gap-2">
 					<label class="font-bold" for="description">Описание</label>
 					<textarea
